@@ -293,15 +293,7 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
               </p>
               <div className="qr-frame" style={{ textAlign: "center" }}>
                 {order.qrImageUrl ? (
-                  <div
-                    style={{
-                      display: "inline-block",
-                      padding: 8,
-                      background: "#fff",
-                      borderRadius: 10,
-                      boxShadow: "0 2px 0 color-mix(in srgb, var(--ink) 18%, transparent)",
-                    }}
-                  >
+                  <div style={{ display: "inline-block", padding: 8 }}>
                     <button
                       type="button"
                       onClick={() => setBigQr(qrSrc || order.qrImageUrl!)}
@@ -317,9 +309,7 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: "inline-block", padding: 8, background: "#fff", borderRadius: 10 }}>
-                    <PaymentQr payload={order.qrString} />
-                  </div>
+                  <PaymentQr payload={order.qrString} />
                 )}
                 {order.qrImageUrl && (
                   <div className="flex items-center justify-center gap-2 flex-wrap" style={{ marginTop: 10, marginBottom: 10 }}>
