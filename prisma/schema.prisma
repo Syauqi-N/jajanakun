@@ -1,0 +1,183 @@
+// jajanakun.store — data model
+// SQLite untuk dev. Ganti provider ke "postgresql" untuk produksi.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @default("")
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  duration    String   @default("") // "1 bulan (30 hari)"
+  warranty    String   @default("") // "Garansi 30 Hari"
+  price       Int // harga jual (Rp)
+  priceWas    Int? // harga coret (Rp)
+  tileBg      String   @default("#221f1f")
+  tileFg      String   @default("#e50914")
+  letter      String   @default("A")
+  featured    Boolean  @default(false) // tampil di "Terlaris"
+  badge       String? // ribbon: "Paling Laris"
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  // Gambar produk persegi (1:1) yang di-upload admin. Null = pakai tile huruf.
+  imageUrl    String?
+  // Pre-order: kalau true, produk dijual sebagai PO (akun dikirim setelah masa PO selesai)
+  isPreOrder  Boolean  @default(false)
+  poEta       String   @default("") // estimasi masa PO, mis. "1-3 hari kerja"
+  poEndsAt    DateTime? // batas batch PO; admin mengatur batch berikutnya
+  poMinQty    Int      @default(0) // minimal pembelian agar PO jalan (0 = tanpa minimum)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  credentials Credential[]
+  orderItems  OrderItem[]
+  claims      WarrantyClaim[]
+
+  @@index([categoryId])
+  @@map("products")
+}
+
+// Satu baris = 1 akun/kredensial yang siap dijual.
+// "available" -> bisa di-assign; "assigned" -> sudah dipakai order.
+model Credential {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  email      String
+  password   String
+  note       String? // catatan tambahan (mis. profil, PIN)
+  status     String    @default("available") // available | assigned | disabled
+  orderItemId String?  @unique
+  orderItem  OrderItem? @relation(fields: [orderItemId], references: [id])
+  assignedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([productId, status])
+  @@map("credentials")
+}
+
+// Pelanggan — wajib login untuk membeli. Bisa daftar via email/password atau Google.
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  wa           String?
+  passwordHash String? // null kalau daftar via Google
+  googleId     String?   @unique
+  avatarUrl    String?
+  createdAt    DateTime  @default(now())
+  orders       Order[]
+
+  @@map("users")
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  code       String   @unique // GK-XXXXXX
+  // Nominal unik: amount = subtotal + uniqueCents, dipakai matching webhook SoqiPG
+  subtotal   Int
+  uniqueCode Int // 1..199
+  amount     Int // subtotal + uniqueCode  <-- yang harus dibayar
+  // PENDING | PAID | CLAIMED | DELIVERED | CANCELLED | REFUNDED
+  // Alur v2: PENDING (belum bayar) -> PAID (sudah bayar, nunggu di-claim) -> DELIVERED (admin sudah kirim akun)
+  status     String   @default("PENDING")
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  buyerName  String?
+  buyerWa    String?
+  buyerNote  String?
+  // SoqiPG
+  paymentRef String?  @unique // reference dari gateway
+  qrString   String? // payload QRIS
+  qrImageUrl String?
+  expiresAt  DateTime
+  paidAt     DateTime?
+  deliveredAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  items   OrderItem[]
+  claims  WarrantyClaim[]
+
+  @@index([status])
+  @@index([amount])
+  @@index([userId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  // snapshot nama & harga saat checkout
+  name      String
+  price     Int
+  qty       Int
+  // snapshot kalau item ini pre-order
+  isPreOrder Boolean @default(false)
+  poEta      String  @default("")
+  poEndsAt   DateTime?
+  poMinQty   Int     @default(0)
+  // track berapa qty yang sudah dapat kredensial
+  deliveredQty Int  @default(0)
+
+  credential Credential?
+  claims     WarrantyClaim[]
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model WarrantyClaim {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  orderItemId String?
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  reason      String
+  status      String   @default("OPEN") // OPEN | RESOLVED | REJECTED
+  resolution  String?
+  replacementCredentialId String?
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+
+  @@index([status])
+  @@map("warranty_claims")
+}
+
+// Audit log pembayaran & aksi penting (idempotency webhook, dsb.)
+model PaymentEvent {
+  id        String   @id @default(cuid())
+  orderId   String?
+  ref       String?  @unique // event/ref id dari gateway -> cegah double proses
+  type      String // webhook.received | webhook.paid | manual.paid | ...
+  raw       String? // payload mentah
+  createdAt DateTime @default(now())
+
+  @@map("payment_events")
+}

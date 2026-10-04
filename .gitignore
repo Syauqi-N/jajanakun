@@ -1,0 +1,20 @@
+node_modules
+.next
+.env
+.env*.local
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+next-env.d.ts
+.DS_Store
+
+# Upload user (hasilkan runtime, jangan di-commit)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Artefak TypeScript
+*.tsbuildinfo
+
+# Catatan lokal
+server.txt

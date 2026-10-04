@@ -1,0 +1,35 @@
+# Compose untuk SERVER PRODUKSI.
+#
+# Pakai image jadi dari GHCR — server hanya menarik, tidak membangun.
+#   cd /opt/jajanakun && docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Semua variabel dibaca dari berkas `.env` di direktori yang sama.
+name: jajanakun
+
+services:
+  app:
+    image: ghcr.io/syauqi-n/jajanakun:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # SQLite di volume persisten.
+      DATABASE_URL: "file:/app/data/prod.db"
+      NODE_ENV: "production"
+      PORT: "3000"
+      # WAJIB diisi di .env produksi:
+      #   NEXT_PUBLIC_APP_URL=https://jajanakun.store
+      #   ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
+      #   SOQIPG_BASE_URL, SOQIPG_API_KEY, SOQIPG_WEBHOOK_SECRET
+      #   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXT_PUBLIC_GOOGLE_ENABLED=1
+      #   NEXT_PUBLIC_ADMIN_WA
+    volumes:
+      - jajanakun-data:/app/data
+      - jajanakun-uploads:/app/public/uploads
+    # Hanya bind ke localhost: cloudflared di server yang meneruskan trafik.
+    ports:
+      - "127.0.0.1:8890:3000"
+
+volumes:
+  jajanakun-data:
+  jajanakun-uploads:

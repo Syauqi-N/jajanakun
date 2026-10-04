@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>golekakun.store — Mockup Desktop (Retro Warung)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f1e5c8;
+        --paper: #fbf3dc;
+        --paper-2: #f6ead0;
+        --ink: #33241a;
+        --ink-soft: #6f5942;
+        --red: #b3392a;
+        --red-dark: #8e2a1f;
+        --red-ink: #a52f22;
+        --green: #2f6b45;
+        --green-dark: #1e4a2d;
+        --mustard: #e2a41c;
+        --mustard-soft: #f3cd72;
+        --wood: #7a4a2b;
+        --wood-dark: #5b351e;
+        --wood-light: #96603a;
+        --line: #33241a;
+        --shadow: 5px 5px 0 rgba(51, 36, 26, 0.9);
+        --shadow-sm: 3px 3px 0 rgba(51, 36, 26, 0.9);
+        --note-1: #fbe9a7;
+        --note-2: #fbd9c0;
+        --note-3: #d9eac3;
+        --note-4: #f6cdd3;
+        --overlay: rgba(43, 29, 18, 0.55);
+      }
+    </style>
+    <!--
+        ==========================================================================
+        DESIGN TOKENS — golekakun.store (Tema Retro Warung)
+        Ringkasan ini diekstrak langsung dari nilai aktual variabel :root di atas
+        (bukan perkiraan). Kalau ubah token, update :root-nya, bukan komentar ini.
+        Mode gelap meng-override token yang sama lewat
+        @media (prefers-color-scheme: dark) :root tepat di bawah komentar ini.
+
+        ── 1. WARNA ─────────────────────────────────────────────────────────────
+        LIGHT (default :root)
+          --bg           #f1e5c8   Background halaman (krem warung)
+          --paper        #fbf3dc   Permukaan kartu / kertas terang
+          --paper-2      #f6ead0   Permukaan sekunder (header alt, footer, drawer)
+          --ink          #33241a   Teks utama + warna garis (--line sama nilainya)
+          --ink-soft     #6f5942   Teks sekunder / deskripsi
+          --red          #b3392a   Aksen utama warung (plang, tombol, marquee)
+          --red-dark     #8e2a1f   Varian gelap merah
+          --red-ink      #a52f22   Tinta stempel & kicker section
+          --green        #2f6b45   Aksen sukses / tombol keranjang & chip aktif
+          --green-dark   #1e4a2d   Papan pembayaran, topstrip
+          --mustard      #e2a41c   CTA sekunder / highlight / badge (bukan warna harga)
+          --mustard-soft #f3cd72   Aksen terang di atas papan kayu & logo
+          --wood         #7a4a2b   Kayu papan (tengah gradasi)
+          --wood-dark    #5b351e   Kayu gelap (ujung gradasi, sticky bar mobile)
+          --wood-light   #96603a   Kayu terang (awal gradasi papan)
+          --line         #33241a   Garis/border neo-brutalist (solid 2–4px, termasuk varian 2.5px)
+          --note-1       #fbe9a7   Kertas tempel testimoni 1 (kuning)
+          --note-2       #fbd9c0   Kertas tempel testimoni 2 (peach)
+          --note-3       #d9eac3   Kertas tempel testimoni 3 (hijau muda)
+          --note-4       #f6cdd3   Kertas tempel testimoni 4 (pink)
+          --overlay      rgba(43, 29, 18, 0.55)  Backdrop drawer/modal
+
+        DARK (@media prefers-color-scheme: dark :root)
+          --bg #221812 · --paper #31241a · --paper-2 #2a1e15
+          --ink #f0e2c4 · --ink-soft #c3a983 · --line #f0e2c4
+          --red #cf5138 · --red-dark #a83a26 · --red-ink #e0684e
+          --green #58a06e · --green-dark #3c7a4f
+          --mustard #e2a41c (tetap) · --mustard-soft #8a6a24
+          --wood #6e4525 · --wood-dark #4e2f16 · --wood-light #86603c
+          --note-1 #5c4d1e · --note-2 #5e3c26 · --note-3 #39512a · --note-4 #5e2f38
+          --overlay rgba(10, 6, 3, 0.7)
+
+        ── 2. BAYANGAN & GARIS ─────────────────────────────────────────────────
+          --shadow     light 5px 5px 0 rgba(51, 36, 26, 0.9) · dark 5px 5px 0 rgba(0, 0, 0, 0.65)
+          --shadow-sm  light 3px 3px 0 rgba(51, 36, 26, 0.9) · dark 3px 3px 0 rgba(0, 0, 0, 0.65)
+          Pola: offset keras tanpa blur (light memakai rgba ink, dark memakai hitam).
+          Border khas: 3px solid var(--line) (kartu), 4px untuk papan/modal.
+
+        ── 3. TIPOGRAFI ───────────────────────────────────────────────────────
+          Display : "Alfa Slab One", serif — weight 400 saja.
+                    Dipakai h1/h2, .slab, .logo-main, angka langkah, marquee.
+          Body    : "Plus Jakarta Sans", system-ui, sans-serif
+                    Base 16px / line-height 1.55. Bobot dimuat 400;500;600;700;800.
+          Mono    : "Space Mono", monospace — bobot 400;700.
+                    Dipakai harga (.price-now 700 19px), kicker, label, stempel,
+                    jam buka, kode pesanan, chip pembayaran.
+          Skala kunci: h1 papan clamp(2.3rem, 4.4vw, 3.9rem)/1.04,
+          h2 section clamp(1.6rem, 3vw, 2.3rem)/1.1.
+
+        ── 4. POLA KOMPONEN ───────────────────────────────────────────────────
+        a) PRICE TAG — .tag-card (hero .laris-grid + katalog .catalog-grid)
+           • background var(--paper), border 3px solid var(--line), radius 8px,
+             box-shadow var(--shadow-sm), padding 26px 18px 16px (mini: 24px 15px 13px).
+           • Lubang gantungan ::before — lingkaran 15×15px di top:9px center,
+             background var(--bg), border 2.5px solid var(--line).
+           • Tile ikon 52×52px radius 10px border 2.5px (mini 42×42px).
+           • Harga: .price-now Space Mono 700 19px (mini 16px);
+             .price-was Space Mono 12.5px coret merah 2px.
+           • Ribbon opsional .ribbon — var(--red), Space Mono 700 10.5px,
+             border 2.5px, radius 5px 0 0 5px, rotate 2deg.
+
+        b) STEMPEL GARANSI — .stamp (di .tag-foot tiap kartu)
+           • Space Mono 700 10.5px, letter-spacing .09em, uppercase, nowrap.
+           • Warna tinta var(--red-ink) #a52f22 (dark #e0684e).
+           • border 2.5px double var(--red-ink), radius 4px, padding 3px 7px,
+             transform rotate(-6deg), opacity .92,
+             background color-mix(in srgb, var(--paper) 82%, transparent).
+           • Varian besar .stamp-big (stempel LUNAS): 30px, border 4px double,
+             radius 8px, padding 8px 22px, rotate(-7deg), letter-spacing .12em.
+
+        c) PAPAN KAYU — .papan (hero)
+           • Isi papan: repeating-linear-gradient garis papan (per 118px) +
+             linear-gradient(160deg, var(--wood-light) → var(--wood) 55% →
+             var(--wood-dark)). Border 4px solid var(--line), radius 10px,
+             box-shadow var(--shadow), padding 40px 42px 36px, teks #fdf3da.
+           • Gantungan tali ::before/::after — strip 14×40px di top:-4px,
+             left/right 58px, pola repeating 5px #3c2716/#5b3a20.
+           • Judul Alfa Slab One dengan text-shadow 3px 3px 0 rgba(0,0,0,.35);
+             kata sorot .hl warna var(--mustard) digaris-bawahi var(--red) 5px.
+           • Turunan solid (bukan gradasi kayu): .pay-board memakai
+             background solid var(--green-dark) dengan border 4px & radius 10px
+             yang sama; .mobile-bar memakai background solid var(--wood-dark).
+
+        d) STICKY CHECKOUT BAR — header lengket + bar keranjang mobile
+           • .site-header: position sticky top:0 z-index 900, background
+             var(--paper), border-bottom 3px solid var(--line).
+           • .mobile-bar: fixed left/right/bottom 12px, z-index 940,
+             background var(--wood-dark), teks #fdf3da, border 3px solid
+             var(--line), radius 10px, shadow 4px 4px 0 rgba(20,12,6,.5),
+             padding 11px 14px; tampil (display:flex) saat keranjang terisi.
+             Total .mb-total Space Mono 700 15px; tombolnya var(--mustard)
+             teks #33241a border 2.5px.
+           • Tombol keranjang header .cart-btn: var(--green), border 3px,
+             radius 8px, shadow var(--shadow-sm); badge .cart-count
+             var(--mustard) pill Space Mono 700 13px.
+           • Interaksi tombol khas tema: hover geser -1px & bayangan membesar;
+             active .btn/.cart-btn geser +2px, .add-btn geser +1.5px, bayangan menyusut 1px.
+        ==========================================================================
+    -->
+    <style>
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #221812;
+          --paper: #31241a;
+          --paper-2: #2a1e15;
+          --ink: #f0e2c4;
+          --ink-soft: #c3a983;
+          --red: #cf5138;
+          --red-dark: #a83a26;
+          --red-ink: #e0684e;
+          --green: #58a06e;
+          --green-dark: #3c7a4f;
+          --mustard: #e2a41c;
+          --mustard-soft: #8a6a24;
+          --wood: #6e4525;
+          --wood-dark: #4e2f16;
+          --wood-light: #86603c;
+          --line: #f0e2c4;
+          --shadow: 5px 5px 0 rgba(0, 0, 0, 0.65);
+          --shadow-sm: 3px 3px 0 rgba(0, 0, 0, 0.65);
+          --note-1: #5c4d1e;
+          --note-2: #5e3c26;
+          --note-3: #39512a;
+          --note-4: #5e2f38;
+          --overlay: rgba(10, 6, 3, 0.7);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      /* paper grain over everything */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        pointer-events: none;
+        opacity: 0.35;
+        mix-blend-mode: multiply;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="180" height="180" filter="url(%23n)" opacity="0.16"/></svg>');
+      }
+      @media (prefers-color-scheme: dark) {
+        body::after { mix-blend-mode: screen; opacity: 0.18; }
+      }
+      ::selection { background: var(--mustard); color: #33241a; }
+      h1, h2, h3 { margin: 0; }
+      button { font: inherit; cursor: pointer; }
+      input { font: inherit; }
+      .wrap { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+      .slab { font-family: "Alfa Slab One", serif; font-weight: 400; letter-spacing: 0.01em; }
+      .mono { font-family: "Space Mono", monospace; }
+
+      /* ---------- top strip ---------- */
+      .topstrip {
+        background: var(--green-dark);
+        color: #f6ead0;
+        font-family: "Space Mono", monospace;
+        font-size: 12.5px;
+        letter-spacing: 0.04em;
+      }
+      .topstrip .wrap {
+        display: flex; justify-content: space-between; gap: 16px;
+        padding-top: 7px; padding-bottom: 7px; flex-wrap: wrap;
+      }
+      .topstrip b { color: var(--mustard-soft); font-weight: 700; }
+
+      /* ---------- header ---------- */
+      .site-header {
+        position: sticky; top: 0; z-index: 900;
+        background: var(--paper);
+        border-bottom: 3px solid var(--line);
+      }
+      .site-header .wrap {
+        display: flex; align-items: center; gap: 28px;
+        padding-top: 14px; padding-bottom: 14px;
+      }
+      .logo-plang {
+        display: inline-flex; align-items: stretch; gap: 0;
+        text-decoration: none; transform: rotate(-1.6deg);
+        filter: drop-shadow(3px 3px 0 rgba(51,36,26,.85));
+        flex: none;
+      }
+      .logo-main {
+        background: var(--red);
+        color: #fdf6e3;
+        border: 3px solid var(--line);
+        padding: 8px 14px 9px;
+        font-family: "Alfa Slab One", serif;
+        font-size: 21px; line-height: 1; letter-spacing: 0.02em;
+        border-radius: 6px 0 0 6px;
+      }
+      .logo-main em { font-style: normal; color: var(--mustard-soft); }
+      .logo-tld {
+        background: var(--mustard);
+        color: #33241a;
+        border: 3px solid var(--line); border-left: none;
+        display: flex; align-items: center;
+        padding: 0 10px;
+        font-family: "Space Mono", monospace; font-weight: 700; font-size: 14px;
+        border-radius: 0 6px 6px 0;
+      }
+      .main-nav { display: flex; gap: 4px; margin-left: 8px; }
+      .main-nav a {
+        color: var(--ink); text-decoration: none; font-weight: 700; font-size: 15px;
+        padding: 8px 13px; border-radius: 6px; border: 2px solid transparent;
+      }
+      .main-nav a:hover { border-color: var(--line); background: var(--paper-2); }
+      .header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+      .jam-buka {
+        font-family: "Space Mono", monospace; font-size: 12px; color: var(--ink-soft);
+        text-align: right; line-height: 1.35; display: none;
+      }
+      @media (min-width: 1080px) { .jam-buka { display: block; } }
+      .jam-buka b { color: var(--green); }
+      .cart-btn {
+        position: relative;
+        display: inline-flex; align-items: center; gap: 9px;
+        background: var(--green); color: #fdf6e3;
+        border: 3px solid var(--line); border-radius: 8px;
+        padding: 9px 16px; font-weight: 800; font-size: 15px;
+        box-shadow: var(--shadow-sm);
+        transition: transform .08s ease, box-shadow .08s ease;
+      }
+      .cart-btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(51,36,26,.9); }
+      .cart-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(51,36,26,.9); }
+      .cart-count {
+        background: var(--mustard); color: #33241a;
+        border: 2px solid var(--line); border-radius: 999px;
+        min-width: 26px; height: 26px; padding: 0 6px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-family: "Space Mono", monospace; font-weight: 700; font-size: 13px;
+      }
+
+      /* ---------- hero ---------- */
+      .hero { padding: 44px 0 8px; }
+      .hero-grid {
+        display: grid; grid-template-columns: 1.04fr 0.96fr; gap: 34px; align-items: start;
+      }
+      .papan {
+        position: relative;
+        background:
+          repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0 2px, transparent 2px 118px),
+          repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 3px, transparent 3px 9px),
+          linear-gradient(160deg, var(--wood-light), var(--wood) 55%, var(--wood-dark));
+        border: 4px solid var(--line);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        padding: 40px 42px 36px;
+        color: #fdf3da;
+        overflow: hidden;
+      }
+      .papan::before, .papan::after {
+        content: ""; position: absolute; top: -4px; width: 14px; height: 40px;
+        background: repeating-linear-gradient(0deg, #3c2716 0 5px, #5b3a20 5px 10px);
+        border: 2px solid rgba(0,0,0,.35); border-top: none; border-radius: 0 0 6px 6px;
+      }
+      .papan::before { left: 58px; }
+      .papan::after { right: 58px; }
+      .papan .ukiran {
+        display: flex; align-items: center; gap: 12px;
+        color: var(--mustard-soft); margin-bottom: 14px;
+      }
+      .papan .ukiran svg { flex: none; }
+      .papan .ukiran .rule { height: 2px; background: currentColor; flex: 1; opacity: .6; }
+      .papan-kicker {
+        font-family: "Space Mono", monospace; font-size: 13px; letter-spacing: .14em;
+        color: var(--mustard-soft); text-transform: uppercase; margin: 0 0 10px;
+      }
+      .papan h1 {
+        font-family: "Alfa Slab One", serif; font-weight: 400;
+        font-size: clamp(2.3rem, 4.4vw, 3.9rem); line-height: 1.04;
+        text-shadow: 3px 3px 0 rgba(0,0,0,.35);
+        margin-bottom: 16px;
+      }
+      .papan h1 .hl {
+        color: var(--mustard);
+        text-decoration: underline; text-decoration-thickness: 5px;
+        text-decoration-color: var(--red); text-underline-offset: 6px;
+      }
+      .papan p.lead { font-size: 17.5px; max-width: 46ch; margin: 0 0 24px; color: #f7ecd2; }
+      .papan-cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        border: 3px solid var(--line); border-radius: 8px;
+        padding: 12px 22px; font-weight: 800; font-size: 16px;
+        text-decoration: none; box-shadow: var(--shadow-sm);
+        transition: transform .08s ease, box-shadow .08s ease;
+        background: var(--paper); color: var(--ink);
+      }
+      .btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(51,36,26,.9); }
+      .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(51,36,26,.9); }
+      .btn-red { background: var(--red); color: #fdf6e3; }
+      .btn-mustard { background: var(--mustard); color: #33241a; }
+      .btn-green { background: var(--green); color: #fdf6e3; }
+      .btn-ghost { background: transparent; color: #fdf3da; border-color: #fdf3da; box-shadow: 3px 3px 0 rgba(0,0,0,.4); }
+      .papan-meta {
+        display: flex; gap: 22px; flex-wrap: wrap; margin-top: 26px;
+        font-family: "Space Mono", monospace; font-size: 12.5px; color: #efe0bd;
+      }
+      .papan-meta span::before { content: "✓ "; color: var(--mustard); font-weight: 700; }
+
+      /* featured mini price-tags */
+      .laris-head {
+        display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+        margin: 6px 2px 14px;
+      }
+      .laris-head h2 { font-family: "Alfa Slab One", serif; font-weight: 400; font-size: 21px; }
+      .laris-head .mono { font-size: 12px; color: var(--ink-soft); letter-spacing: .08em; }
+      .laris-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+      /* price tag card (shared hero + catalog) */
+      .tag-card {
+        position: relative;
+        background: var(--paper);
+        border: 3px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        padding: 26px 18px 16px;
+        display: flex; flex-direction: column; gap: 8px;
+      }
+      .tag-card::before {
+        content: ""; position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+        width: 15px; height: 15px; border-radius: 50%;
+        background: var(--bg); border: 2.5px solid var(--line);
+        box-shadow: inset 0 0 0 2px var(--paper);
+      }
+      .tag-card.mini { padding: 24px 15px 13px; gap: 6px; }
+      .tile {
+        width: 52px; height: 52px; border-radius: 10px; flex: none;
+        border: 2.5px solid var(--line);
+        display: flex; align-items: center; justify-content: center;
+        font-family: "Alfa Slab One", serif; font-size: 21px;
+        box-shadow: 2px 2px 0 rgba(51,36,26,.8);
+      }
+      .tag-card.mini .tile { width: 42px; height: 42px; font-size: 17px; border-radius: 8px; }
+      .tag-top { display: flex; gap: 12px; align-items: flex-start; }
+      .tag-name { font-weight: 800; font-size: 16.5px; line-height: 1.25; }
+      .tag-card.mini .tag-name { font-size: 14.5px; }
+      .tag-dur {
+        font-family: "Space Mono", monospace; font-size: 12px; color: var(--ink-soft);
+        letter-spacing: .03em;
+      }
+      .tag-desc { font-size: 13.5px; color: var(--ink-soft); margin: 0; }
+      .price-row { display: flex; align-items: baseline; gap: 9px; margin-top: auto; flex-wrap: wrap; }
+      .price-was {
+        font-family: "Space Mono", monospace; font-size: 12.5px; color: var(--ink-soft);
+        text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px;
+      }
+      .price-now { font-family: "Space Mono", monospace; font-weight: 700; font-size: 19px; }
+      .tag-card.mini .price-now { font-size: 16px; }
+      .tag-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
+      .stamp {
+        font-family: "Space Mono", monospace; font-weight: 700; font-size: 10.5px;
+        letter-spacing: .09em; color: var(--red-ink);
+        border: 2.5px double var(--red-ink); border-radius: 4px;
+        padding: 3px 7px; transform: rotate(-6deg);
+        text-transform: uppercase; white-space: nowrap; opacity: .92;
+        background: color-mix(in srgb, var(--paper) 82%, transparent);
+      }
+      .add-btn {
+        background: var(--mustard); color: #33241a;
+        border: 2.5px solid var(--line); border-radius: 7px;
+        font-weight: 800; font-size: 13.5px; padding: 7px 12px;
+        box-shadow: 2.5px 2.5px 0 rgba(51,36,26,.9);
+        transition: transform .08s ease, box-shadow .08s ease;
+        white-space: nowrap;
+      }
+      .add-btn:hover { transform: translate(-1px,-1px); box-shadow: 3.5px 3.5px 0 rgba(51,36,26,.9); }
+      .add-btn:active { transform: translate(1.5px,1.5px); box-shadow: 1px 1px 0 rgba(51,36,26,.9); }
+      .ribbon {
+        position: absolute; top: 14px; right: -3px;
+        background: var(--red); color: #fdf6e3;
+        font-family: "Space Mono", monospace; font-weight: 700; font-size: 10.5px;
+        letter-spacing: .08em; padding: 4px 9px 4px 11px;
+        border: 2.5px solid var(--line); border-right: none;
+        border-radius: 5px 0 0 5px; transform: rotate(2deg);
+      }
+      .tag-card.has-ribbon .tag-top { padding-right: 76px; }
+      .tag-name-btn {
+        background: none; border: none; padding: 0; text-align: left; color: inherit;
+        font: inherit; font-weight: 800; cursor: pointer;
+      }
+      .tag-name-btn:hover { text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 2.5px; text-underline-offset: 3px; }
+
+      /* ---------- marquee ---------- */
+      .marquee {
+        margin-top: 40px;
+        background: var(--red);
+        border-top: 3px solid var(--line); border-bottom: 3px solid var(--line);
+        overflow: hidden; transform: rotate(-0.6deg) scale(1.01);
+      }
+      .marquee-track {
+        display: flex; width: max-content;
+        animation: marquee 30s linear infinite;
+      }
+      .marquee span {
+        font-family: "Alfa Slab One", serif; color: #fdf6e3;
+        font-size: 16px; letter-spacing: .05em; padding: 10px 0; white-space: nowrap;
+      }
+      .marquee i { font-style: normal; color: var(--mustard); padding: 0 14px; }
+      @keyframes marquee { to { transform: translateX(-50%); } }
+      @media (prefers-reduced-motion: reduce) {
+        .marquee-track { animation: none; }
+        html { scroll-behavior: auto; }
+      }
+
+      /* ---------- sections ---------- */
+      section.block { padding: 56px 0 8px; }
+      .sec-head { margin-bottom: 22px; }
+      .sec-kicker {
+        font-family: "Space Mono", monospace; font-size: 12px; letter-spacing: .16em;
+        text-transform: uppercase; color: var(--red-ink); margin: 0 0 6px; font-weight: 700;
+      }
+      .sec-head h2 {
+        font-family: "Alfa Slab One", serif; font-weight: 400;
+        font-size: clamp(1.6rem, 3vw, 2.3rem); line-height: 1.1;
+      }
+      .sec-head p { color: var(--ink-soft); max-width: 62ch; margin: 8px 0 0; }
+
+      /* katalog toolbar */
+      .toolbar {
+        display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+        margin-bottom: 22px;
+      }
+      .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+      .chip {
+        background: var(--paper); color: var(--ink);
+        border: 2.5px solid var(--line); border-radius: 999px;
+        padding: 7px 15px; font-weight: 700; font-size: 14px;
+        box-shadow: 2.5px 2.5px 0 rgba(51,36,26,.85);
+        transition: transform .08s ease, box-shadow .08s ease, background .12s ease;
+      }
+      .chip:hover { transform: translate(-1px,-1px); }
+      .chip[aria-pressed="true"] { background: var(--green); color: #fdf6e3; }
+      .search-box { margin-left: auto; position: relative; }
+      .search-box input {
+        background: var(--paper); color: var(--ink);
+        border: 2.5px solid var(--line); border-radius: 8px;
+        padding: 9px 14px 9px 38px; font-size: 14.5px; width: 250px;
+        box-shadow: 2.5px 2.5px 0 rgba(51,36,26,.85);
+      }
+      .search-box input::placeholder { color: var(--ink-soft); }
+      .search-box svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); }
+      .catalog-grid {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+      }
+      .empty-msg {
+        grid-column: 1 / -1; text-align: center; padding: 42px 20px;
+        border: 3px dashed var(--ink-soft); border-radius: 10px; color: var(--ink-soft);
+        font-family: "Space Mono", monospace; font-size: 14px;
+      }
+
+      /* cara beli */
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .step {
+        background: var(--paper); border: 3px solid var(--line); border-radius: 10px;
+        box-shadow: var(--shadow-sm); padding: 24px 22px 20px; position: relative;
+      }
+      .step-num {
+        font-family: "Alfa Slab One", serif; font-size: 44px; line-height: 1;
+        color: var(--mustard); -webkit-text-stroke: 2px var(--line);
+        text-shadow: 3px 3px 0 rgba(51,36,26,.85);
+        margin-bottom: 12px;
+      }
+      .step h3 { font-size: 18px; margin-bottom: 6px; }
+      .step p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
+
+      /* split: payment board + testimonials */
+      .split { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 22px; align-items: start; }
+      .pay-board {
+        background: var(--green-dark); color: #f3e9cd;
+        border: 4px solid var(--line); border-radius: 10px; box-shadow: var(--shadow);
+        padding: 28px 28px 24px;
+      }
+      .pay-board h3 { font-family: "Alfa Slab One", serif; font-weight: 400; font-size: 21px; margin-bottom: 6px; }
+      .pay-board p { margin: 0 0 18px; font-size: 14.5px; color: #e4d5ac; }
+      .pay-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+      .pay-chip {
+        background: #fdf6e3; color: #33241a;
+        border: 2.5px solid #33241a; border-radius: 7px;
+        font-family: "Space Mono", monospace; font-weight: 700; font-size: 14px;
+        padding: 8px 14px; box-shadow: 3px 3px 0 rgba(0,0,0,.4);
+      }
+      .pay-chip.hero-chip { background: var(--mustard); font-size: 16px; padding: 10px 18px; }
+      .pay-note {
+        margin-top: 18px; font-family: "Space Mono", monospace; font-size: 12.5px;
+        border-top: 2px dashed rgba(243,233,205,.4); padding-top: 14px; color: #efe0bd;
+      }
+      .testi-board {
+        background: var(--paper-2);
+        border: 3px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-sm);
+        padding: 24px 24px 10px;
+      }
+      .testi-board h3 { font-family: "Alfa Slab One", serif; font-weight: 400; font-size: 21px; margin-bottom: 16px; }
+      .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding-bottom: 16px; }
+      .note {
+        position: relative; padding: 22px 16px 14px;
+        font-size: 14px; line-height: 1.5; color: #3a2a1a;
+        box-shadow: 3px 4px 0 rgba(51,36,26,.35);
+        border-radius: 2px 2px 8px 2px;
+      }
+      @media (prefers-color-scheme: dark) { .note { color: #f4e8cd; } }
+      .note::before {
+        content: ""; position: absolute; top: -11px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+        width: 74px; height: 22px; background: rgba(230, 205, 140, .75);
+        border: 1px solid rgba(51,36,26,.25);
+      }
+      .note p { margin: 0 0 10px; }
+      .note footer { font-family: "Space Mono", monospace; font-size: 12px; font-weight: 700; }
+      .note .stars { color: var(--red-ink); letter-spacing: 2px; font-size: 13px; }
+      @media (prefers-color-scheme: dark) { .note .stars { color: var(--mustard); } }
+      .n1 { background: var(--note-1); transform: rotate(-1.6deg); }
+      .n2 { background: var(--note-2); transform: rotate(1.3deg); }
+      .n3 { background: var(--note-3); transform: rotate(1.8deg); }
+      .n4 { background: var(--note-4); transform: rotate(-1.2deg); }
+
+      /* FAQ */
+      .faq-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+      details.faq {
+        background: var(--paper); border: 3px solid var(--line); border-radius: 10px;
+        box-shadow: var(--shadow-sm); padding: 0 20px;
+      }
+      details.faq summary {
+        cursor: pointer; font-weight: 800; font-size: 15.5px;
+        padding: 16px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px;
+      }
+      details.faq summary::-webkit-details-marker { display: none; }
+      details.faq summary::after {
+        content: "+"; font-family: "Space Mono", monospace; font-weight: 700;
+        color: var(--red-ink); font-size: 20px; line-height: 1;
+      }
+      details.faq[open ] summary::after { content: "–"; }
+      details.faq p { margin: 0 0 16px; color: var(--ink-soft); font-size: 14.5px; }
+
+      /* footer */
+      .site-footer {
+        margin-top: 64px; background: var(--paper-2);
+        border-top: 3px solid var(--line);
+      }
+      .site-footer .wrap {
+        display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 28px;
+        padding-top: 34px; padding-bottom: 30px;
+      }
+      .site-footer h4 { font-family: "Space Mono", monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 12px; color: var(--red-ink); }
+      .site-footer a { color: var(--ink); text-decoration: none; display: block; padding: 3px 0; font-size: 14.5px; }
+      .site-footer a:hover { text-decoration: underline; text-decoration-color: var(--red); text-underline-offset: 3px; }
+      .site-footer p { font-size: 14px; color: var(--ink-soft); margin: 10px 0 0; max-width: 36ch; }
+      .foot-bar {
+        border-top: 2px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+        font-family: "Space Mono", monospace; font-size: 12px; color: var(--ink-soft);
+      }
+      .foot-bar .wrap { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 14px; }
+
+      /* ---------- drawer & modals ---------- */
+      .overlay {
+        position: fixed; inset: 0; background: var(--overlay); z-index: 950;
+        opacity: 0; pointer-events: none; transition: opacity .18s ease;
+      }
+      .overlay.show { opacity: 1; pointer-events: auto; }
+      .drawer {
+        position: fixed; top: 0; right: 0; height: 100dvh; width: min(430px, 94vw);
+        background: var(--paper); border-left: 4px solid var(--line); z-index: 960;
+        transform: translateX(105%); transition: transform .22s ease;
+        display: flex; flex-direction: column;
+      }
+      .drawer.show { transform: translateX(0); }
+      .drawer-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 20px; border-bottom: 3px solid var(--line);
+        background: var(--paper-2);
+      }
+      .drawer-head h3 { font-family: "Alfa Slab One", serif; font-weight: 400; font-size: 19px; }
+      .x-btn {
+        background: var(--red); color: #fdf6e3; border: 2.5px solid var(--line);
+        width: 36px; height: 36px; border-radius: 8px; font-weight: 800; font-size: 17px;
+        box-shadow: 2px 2px 0 rgba(51,36,26,.9); line-height: 1;
+      }
+      .drawer-items { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+      .cart-empty {
+        text-align: center; color: var(--ink-soft); padding: 48px 12px;
+        font-family: "Space Mono", monospace; font-size: 14px;
+      }
+      .cart-item {
+        display: flex; gap: 12px; align-items: center;
+        border: 2.5px solid var(--line); border-radius: 9px; padding: 10px 12px;
+        background: var(--paper); box-shadow: 2.5px 2.5px 0 rgba(51,36,26,.8);
+      }
+      .cart-item .tile { width: 40px; height: 40px; font-size: 16px; border-radius: 8px; }
+      .cart-item .ci-name { font-weight: 800; font-size: 14px; line-height: 1.3; }
+      .cart-item .ci-price { font-family: "Space Mono", monospace; font-size: 13px; color: var(--ink-soft); }
+      .qty { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+      .qty button {
+        width: 27px; height: 27px; border-radius: 6px;
+        border: 2px solid var(--line); background: var(--paper-2); font-weight: 800;
+        box-shadow: 1.5px 1.5px 0 rgba(51,36,26,.9);
+      }
+      .qty b { font-family: "Space Mono", monospace; min-width: 18px; text-align: center; }
+      .drawer-foot { border-top: 3px solid var(--line); padding: 16px 20px 20px; background: var(--paper-2); }
+      .row-line { display: flex; justify-content: space-between; font-size: 14.5px; padding: 3px 0; }
+      .row-line.total { font-size: 17px; font-weight: 800; border-top: 2px dashed color-mix(in srgb, var(--ink) 40%, transparent); margin-top: 8px; padding-top: 10px; }
+      .row-line .mono { font-weight: 700; }
+      .drawer-foot .btn { width: 100%; justify-content: center; margin-top: 12px; }
+      .drawer-foot .btn[disabled] { opacity: .45; pointer-events: none; }
+      .kirim-note { font-family: "Space Mono", monospace; font-size: 11.5px; color: var(--ink-soft); text-align: center; margin: 10px 0 0; }
+
+      .modal {
+        position: fixed; inset: 0; z-index: 970; display: none;
+        align-items: center; justify-content: center; padding: 20px;
+      }
+      .modal.show { display: flex; }
+      .modal-card {
+        background: var(--paper); border: 4px solid var(--line); border-radius: 12px;
+        box-shadow: 7px 7px 0 rgba(20, 12, 6, .55);
+        width: min(560px, 100%); max-height: 92dvh; overflow-y: auto;
+        padding: 28px 30px 26px; position: relative;
+      }
+      .modal-card .x-btn { position: absolute; top: 16px; right: 16px; }
+      .modal-card h3 { font-family: "Alfa Slab One", serif; font-weight: 400; font-size: 23px; margin-bottom: 6px; padding-right: 44px; }
+      .modal-sub { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 16px; }
+      .detail-tile {
+        height: 120px; border-radius: 10px; border: 3px solid var(--line);
+        display: flex; align-items: center; justify-content: center;
+        font-family: "Alfa Slab One", serif; font-size: 52px; margin-bottom: 18px;
+        box-shadow: var(--shadow-sm);
+      }
+      .spec-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; }
+      .spec {
+        border: 2.5px solid var(--line); border-radius: 8px; padding: 9px 12px; background: var(--paper-2);
+      }
+      .spec .k { font-family: "Space Mono", monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); display: block; }
+      .spec .v { font-weight: 800; font-size: 14.5px; }
+      .qr-frame {
+        background: #fdf6e3; border: 3px solid #33241a; border-radius: 10px;
+        padding: 18px; text-align: center; color: #33241a;
+      }
+      .qr-frame svg { display: block; margin: 0 auto 10px; }
+      .qr-total { font-family: "Space Mono", monospace; font-weight: 700; font-size: 21px; }
+      .qr-timer { font-family: "Space Mono", monospace; font-size: 13px; color: #a52f22; font-weight: 700; margin-top: 2px; }
+      .qr-code-line { font-family: "Space Mono", monospace; font-size: 12px; color: #6f5942; margin-top: 8px; }
+      .modal-actions { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+      .modal-actions .btn { flex: 1; justify-content: center; }
+      .success-box { text-align: center; padding: 10px 0 4px; }
+      .stamp-big {
+        display: inline-block; font-family: "Space Mono", monospace; font-weight: 700;
+        font-size: 30px; letter-spacing: .12em; color: var(--red-ink);
+        border: 4px double var(--red-ink); border-radius: 8px; padding: 8px 22px;
+        transform: rotate(-7deg); margin: 12px 0 16px; text-transform: uppercase;
+      }
+      .success-box p { color: var(--ink-soft); margin: 6px 0; font-size: 15px; }
+      .success-box .order-code { font-family: "Space Mono", monospace; font-weight: 700; font-size: 19px; color: var(--ink); }
+      .spinner {
+        width: 20px; height: 20px; border-radius: 50%;
+        border: 3px solid rgba(253,246,227,.35); border-top-color: #fdf6e3;
+        animation: spin .7s linear infinite; display: inline-block;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .order-input {
+        width: 100%; background: var(--paper-2); color: var(--ink);
+        border: 2.5px solid var(--line); border-radius: 8px; padding: 11px 14px;
+        font-family: "Space Mono", monospace; font-size: 15px; text-transform: uppercase;
+        box-shadow: 2.5px 2.5px 0 rgba(51,36,26,.85); margin-bottom: 12px;
+      }
+      .order-result { font-size: 14.5px; margin-top: 12px; display: none; }
+      .order-result.show { display: block; }
+      .status-pill {
+        display: inline-block; font-family: "Space Mono", monospace; font-weight: 700; font-size: 12px;
+        border: 2px solid var(--line); border-radius: 999px; padding: 3px 11px;
+        background: var(--mustard); color: #33241a;
+      }
+
+      /* mobile checkout bar */
+      .mobile-bar {
+        position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 940;
+        background: var(--wood-dark); color: #fdf3da;
+        border: 3px solid var(--line); border-radius: 10px;
+        box-shadow: 4px 4px 0 rgba(20,12,6,.5);
+        padding: 11px 14px; display: none;
+        align-items: center; justify-content: space-between; gap: 12px;
+      }
+      .mobile-bar.show { display: flex; }
+      .mobile-bar .mb-total { font-family: "Space Mono", monospace; font-weight: 700; font-size: 15px; }
+      .mobile-bar .mb-sub { font-family: "Space Mono", monospace; font-size: 11px; opacity: .8; display: block; }
+      .mobile-bar button {
+        background: var(--mustard); color: #33241a; border: 2.5px solid #33241a;
+        border-radius: 7px; font-weight: 800; padding: 9px 14px; font-size: 14px;
+        box-shadow: 2.5px 2.5px 0 rgba(0,0,0,.5);
+      }
+
+      .toast {
+        position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 90px);
+        background: var(--ink); color: var(--paper); z-index: 990;
+        border: 3px solid var(--line); border-radius: 9px;
+        padding: 12px 20px; font-weight: 700; font-size: 14.5px;
+        box-shadow: 4px 4px 0 rgba(20,12,6,.45);
+        transition: transform .22s ease; max-width: 92vw; text-align: center;
+      }
+      .toast.show { transform: translate(-50%, 0); }
+
+      /* ---------- responsive ---------- */
+      @media (max-width: 1080px) {
+        .catalog-grid { grid-template-columns: repeat(3, 1fr); }
+      }
+      @media (max-width: 900px) {
+        .hero-grid { grid-template-columns: 1fr; }
+        .main-nav { display: none; }
+        .steps { grid-template-columns: 1fr; }
+        .split { grid-template-columns: 1fr; }
+        .faq-list { grid-template-columns: 1fr; }
+        .site-footer .wrap { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 680px) {
+        .wrap { padding: 0 16px; }
+        .site-header .wrap { gap: 14px; }
+        .logo-main { font-size: 15px; padding: 6px 9px 7px; }
+        .logo-tld { font-size: 11px; padding: 0 7px; }
+        .cart-btn { padding: 8px 11px; font-size: 14px; gap: 6px; }
+        .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .laris-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+        .papan { padding: 30px 22px 26px; }
+        .search-box { margin-left: 0; width: 100%; }
+        .search-box input { width: 100%; }
+        .notes { grid-template-columns: 1fr; }
+        .mobile-bar { bottom: 10px; }
+        body { padding-bottom: 6px; }
+      }
+      @media (max-width: 460px) {
+        .catalog-grid { grid-template-columns: 1fr; }
+        .laris-grid { grid-template-columns: 1fr; }
+        .topstrip .wrap span:last-child { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topstrip">
+      <div class="wrap">
+        <span>WARUNG AKUN PREMIUM — SUROBOYO &amp; SEKITARE</span>
+        <span>BUKA TIAP DINO <b>08.00–22.00 WIB</b> • ADMIN FAST RESPON</span>
+      </div>
+    </div>
+
+    <header class="site-header">
+      <div class="wrap">
+        <a class="logo-plang" href="#" aria-label="golekakun.store">
+          <span class="logo-main">GOLEK<em>AKUN</em></span>
+          <span class="logo-tld">.STORE</span>
+        </a>
+        <nav class="main-nav" aria-label="Menu utama">
+          <a href="#katalog">Katalog</a>
+          <a href="#carabeli">Cara Beli</a>
+          <a href="#faq">FAQ</a>
+          <a href="#" id="nav-cek-pesanan">Cek Pesanan</a>
+        </nav>
+        <div class="header-actions">
+          <div class="jam-buka">Jam buka<br /><b>08.00 – 22.00 WIB</b></div>
+          <button class="cart-btn" id="open-cart" type="button">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1.6"/><circle cx="19" cy="21" r="1.6"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21.5 7H6"/></svg>
+            Keranjang
+            <span class="cart-count" id="cart-count">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <div class="hero">
+        <div class="wrap hero-grid">
+          <div class="papan">
+            <div class="ukiran" aria-hidden="true">
+              <span class="rule"></span>
+              <svg width="120" height="18" viewBox="0 0 120 18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9 C 14 1, 22 17, 34 9 S 54 1, 60 9 S 86 17, 98 9 S 114 3, 118 9"/><circle cx="60" cy="9" r="2.6" fill="currentColor" stroke="none"/></svg>
+              <span class="rule"></span>
+            </div>
+            <p class="papan-kicker">Warung Digital • Est. 2026 • Surabaya</p>
+            <h1>Golek akun premium?<br /><span class="hl">Nang kene ae.</span></h1>
+            <p class="lead">Netflix, Spotify, Canva, sampek ChatGPT — kabeh ono, rego kaki lima, kualitas bintang lima. Bayar QRIS, verifikasi otomatis. Bar lunas akun dikirim; nek stok lagi disiapno, admin ngirim via chat. Gak perlu ribet, rek.</p>
+            <div class="papan-cta">
+              <a class="btn btn-red" href="#katalog">Delok Katalog ↓</a>
+              <a class="btn btn-ghost" href="#carabeli">Piye Cara Beline?</a>
+            </div>
+            <div class="papan-meta">
+              <span>Garansi sampek 30 dino</span>
+              <span>Bayar QRIS kabeh e-wallet &amp; bank</span>
+              <span>Stok akun dicek saben dino</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="laris-head">
+              <h2>Laris Dino Iki</h2>
+              <span class="mono">UPDATE: SAK IKI • STOK CEK DEWE</span>
+            </div>
+            <div class="laris-grid" id="laris-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARQUEE -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track" id="marquee-track"></div>
+      </div>
+
+      <!-- KATALOG -->
+      <section class="block" id="katalog">
+        <div class="wrap">
+          <div class="sec-head">
+            <p class="sec-kicker">Etalase Warung</p>
+            <h2>Katalog Akun Premium</h2>
+            <p>Kabeh akun digaransi. Nek error sak durunge masa garansi entek, langsung diganti anyar — gak atek drama.</p>
+          </div>
+          <div class="toolbar">
+            <div class="chips" id="chips" role="group" aria-label="Filter kategori"></div>
+            <div class="search-box">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+              <input type="search" id="search-input" placeholder="Golek aplikasi opo, rek?" aria-label="Cari produk" />
+            </div>
+          </div>
+          <div class="catalog-grid" id="catalog-grid"></div>
+        </div>
+      </section>
+
+      <!-- CARA BELI -->
+      <section class="block" id="carabeli">
+        <div class="wrap">
+          <div class="sec-head">
+            <p class="sec-kicker">Gampang, Satset</p>
+            <h2>Cara Beli — 3 Langkah Tok</h2>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <h3>Pilih Akunmu</h3>
+              <p>Delok katalog, klik <b>+ Keranjang</b> nang akun sing mbok pengen. Iso tuku luwih teko siji sekaligus.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <h3>Bayar nganggo QRIS</h3>
+              <p>Scan kode QR nganggo e-wallet utowo m-banking opo ae. Nominal wis pas, verifikasi otomatis — gak perlu kirim bukti transfer.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <h3>Akun Dikirim Bar Lunas</h3>
+              <p>Bar lunas, kredensial akun muncul nang halaman pesananmu. Nek stok lagi disiapno, admin kirim via chat — tetep satset.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PEMBAYARAN + TESTIMONI -->
+      <section class="block">
+        <div class="wrap split">
+          <div class="pay-board">
+            <h3>Bayar e Piye?</h3>
+            <p>Siji QR kanggo kabeh. Scan nganggo aplikasi opo ae sing ono QRIS-e:</p>
+            <div class="pay-chips">
+              <span class="pay-chip hero-chip">QRIS</span>
+              <span class="pay-chip">DANA</span>
+              <span class="pay-chip">OVO</span>
+              <span class="pay-chip">GoPay</span>
+              <span class="pay-chip">ShopeePay</span>
+              <span class="pay-chip">m-Banking</span>
+            </div>
+            <p class="pay-note">Pembayaran dicek otomatis karo sistem. Lunas → pesanan langsung diproses, gak perlu konfirmasi manual nang admin.</p>
+          </div>
+          <div class="testi-board">
+            <h3>Jare Sing Wis Tau Tuku</h3>
+            <div class="notes">
+              <article class="note n1">
+                <p>"Akune langsung dadi, gak sampe 5 menit. Admin e fast respon, ditakoni opo ae dijawab."</p>
+                <footer><span class="stars">★★★★★</span><br />Bagas — Rungkut, Surabaya</footer>
+              </article>
+              <article class="note n2">
+                <p>"Wis langganan Spotify ping 3 nang kene, aman terus. Regane luwih miring timbang liyane."</p>
+                <footer><span class="stars">★★★★★</span><br />Nadia — Sidoarjo</footer>
+              </article>
+              <article class="note n3">
+                <p>"Netflix tau error tengah wulan, langsung diganti anyar. Garansine tenanan, ora mung omongan."</p>
+                <footer><span class="stars">★★★★★</span><br />Putri — Gresik</footer>
+              </article>
+              <article class="note n4">
+                <p>"Bayar e QRIS gampang, nominal wis pas. Cocok gawe sing gak seneng ribet koyok aku."</p>
+                <footer><span class="stars">★★★★★</span><br />Fajar — Wonokromo, Surabaya</footer>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="block" id="faq">
+        <div class="wrap">
+          <div class="sec-head">
+            <p class="sec-kicker">Ditakokno Terus</p>
+            <h2>FAQ</h2>
+          </div>
+          <div class="faq-list">
+            <details class="faq">
+              <summary>Akun e resmi ta? Aman tekan banned?</summary>
+              <p>Kabeh akun sing didol iku akun resmi sing dibayar liwat jalur legal. Selama pemakaian normal (gak dibagi-bagi maneh nang wong liyo), akun aman sampek masa aktif entek.</p>
+            </details>
+            <details class="faq">
+              <summary>Garansine piye cara klaim e?</summary>
+              <p>Cukup chat admin + sebutno kode pesananmu. Nek akun error sak durunge garansi entek, langsung diganti akun anyar utowo sisa masa aktif diganti — milih sing paling cepet gawe sampeyan.</p>
+            </details>
+            <details class="faq">
+              <summary>Bayar e iso nganggo opo ae?</summary>
+              <p>Iso kabeh sing ndukung QRIS: DANA, OVO, GoPay, ShopeePay, lan kabeh m-banking. Siji kode QR kanggo kabeh, verifikasine otomatis.</p>
+            </details>
+            <details class="faq">
+              <summary>Akun dikirim kapan bar bayar?</summary>
+              <p>Umume gak sampe 5 menit bar pembayaran lunas. Nek stok akun lagi disiapno admin, maksimal 1×24 jam — nanging rata-rata tetep sak jam iku uga.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <div>
+          <a class="logo-plang" href="#" aria-label="golekakun.store">
+            <span class="logo-main" style="font-size:17px;">GOLEK<em>AKUN</em></span>
+            <span class="logo-tld" style="font-size:12px;">.STORE</span>
+          </a>
+          <p>Warung akun premium gawe arek Suroboyo lan sekitare. Rego kaki lima, garansi tenanan.</p>
+        </div>
+        <div>
+          <h4>Warung</h4>
+          <a href="#katalog">Katalog</a>
+          <a href="#carabeli">Cara Beli</a>
+          <a href="#faq">FAQ</a>
+          <a href="#" id="foot-cek-pesanan">Cek Pesanan</a>
+        </div>
+        <div>
+          <h4>Bantuan</h4>
+          <a href="#faq">Klaim Garansi</a>
+          <a href="#carabeli">Info Pembayaran</a>
+          <a href="#katalog">Stok Akun</a>
+        </div>
+      </div>
+      <div class="foot-bar">
+        <div class="wrap">
+          <span>© 2026 GOLEKAKUN.STORE — SUROBOYO, JAWA TIMUR</span>
+          <span>BUKA 08.00–22.00 WIB • BAYAR QRIS • GARANSI TENANAN</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- mobile checkout bar -->
+    <div class="mobile-bar" id="mobile-bar">
+      <div>
+        <span class="mb-total" id="mobile-total">Rp0</span>
+        <span class="mb-sub" id="mobile-count">0 barang nang keranjang</span>
+      </div>
+      <button type="button" id="mobile-open-cart">Delok Keranjang →</button>
+    </div>
+
+    <!-- cart drawer -->
+    <div class="overlay" id="overlay"></div>
+    <aside class="drawer" id="cart-drawer" aria-label="Keranjang belanja">
+      <div class="drawer-head">
+        <h3>Keranjangmu</h3>
+        <button class="x-btn" id="close-cart" type="button" aria-label="Tutup keranjang">✕</button>
+      </div>
+      <div class="drawer-items" id="cart-items"></div>
+      <div class="drawer-foot">
+        <div class="row-line"><span>Pangiriman</span><span class="mono">GRATIS — digital</span></div>
+        <div class="row-line total"><span>Total</span><span class="mono" id="cart-total">Rp0</span></div>
+        <button class="btn btn-red" id="checkout-btn" type="button">Bayar nganggo QRIS →</button>
+        <p class="kirim-note">Akun dikirim bar pembayaran lunas terverifikasi.</p>
+      </div>
+    </aside>
+
+    <!-- product detail modal -->
+    <div class="modal" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-name">
+      <div class="modal-card">
+        <button class="x-btn" data-close="detail-modal" type="button" aria-label="Tutup">✕</button>
+        <div class="detail-tile" id="detail-tile">N</div>
+        <h3 id="detail-name">—</h3>
+        <p class="modal-sub" id="detail-desc">—</p>
+        <div class="spec-list">
+          <div class="spec"><span class="k">Durasi</span><span class="v" id="detail-dur">—</span></div>
+          <div class="spec"><span class="k">Garansi</span><span class="v" id="detail-garansi">—</span></div>
+          <div class="spec"><span class="k">Kategori</span><span class="v" id="detail-cat">—</span></div>
+          <div class="spec"><span class="k">Rega</span><span class="v mono" id="detail-price">—</span></div>
+        </div>
+        <p class="modal-sub" style="margin-bottom:0;">Bar bayar lunas, email + password akun muncul nang halaman pesanan. Nek stok lagi disiapno, admin kirim via chat — sebutno kode pesananmu.</p>
+        <div class="modal-actions">
+          <button class="btn btn-mustard" id="detail-add" type="button">+ Lebokno Keranjang</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- checkout modal -->
+    <div class="modal" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+      <div class="modal-card">
+        <button class="x-btn" data-close="checkout-modal" type="button" aria-label="Tutup">✕</button>
+        <div id="checkout-pay-view">
+          <h3 id="checkout-title">Scan Gawe Bayar</h3>
+          <p class="modal-sub">Gunakno aplikasi e-wallet utowo m-banking opo ae sing ono QRIS-e.</p>
+          <div class="qr-frame">
+            <div id="qr-slot"></div>
+            <div class="qr-total" id="qr-total">Rp0</div>
+            <div class="qr-timer" id="qr-timer">Kode entek nang 05:00</div>
+            <div class="qr-code-line" id="qr-code-line">Kode pesanan: —</div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-green" id="paid-btn" type="button">Wis Tak Bayar, Cek!</button>
+          </div>
+          <p class="kirim-note">Iki mockup — pembayaran disimulasi, ora ono transaksi tenanan.</p>
+        </div>
+        <div id="checkout-success-view" class="success-box" hidden>
+          <div class="stamp-big">Lunas</div>
+          <p>Pembayaranmu wis terverifikasi. Matur nuwun, rek!</p>
+          <p>Kode pesananmu:<br /><span class="order-code" id="success-code">—</span></p>
+          <p>Akunmu lagi disiapno. Kredensial muncul nang kene / dikirim admin via chat — simpen kode pesananmu gawe klaim garansi.</p>
+          <div class="modal-actions">
+            <button class="btn btn-red" id="success-close" type="button">Balik Belanja</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- cek pesanan modal -->
+    <div class="modal" id="order-modal" role="dialog" aria-modal="true" aria-labelledby="order-title">
+      <div class="modal-card">
+        <button class="x-btn" data-close="order-modal" type="button" aria-label="Tutup">✕</button>
+        <h3 id="order-title">Cek Pesanan</h3>
+        <p class="modal-sub">Lebokno kode pesanan sing mbok terima bar checkout (format: GK-XXXXXX).</p>
+        <input class="order-input" id="order-input" type="text" placeholder="GK-000000" autocomplete="off" />
+        <div class="modal-actions" style="margin-top:0;">
+          <button class="btn btn-red" id="order-check-btn" type="button">Cek Status</button>
+        </div>
+        <div class="order-result" id="order-result"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+      "use strict";
+
+      var PRODUCTS = [
+        { id: "netflix", name: "Netflix Premium 4K UHD", cat: "Streaming", dur: "1 sasi (30 dino)", price: 48000, was: 152000, garansi: "Garansi 30 Dino", desc: "Profil private, kualitas 4K UHD + HDR, iso nang HP/TV/laptop. Anti on-hold, full garansi.", tileBg: "#221f1f", tileFg: "#e50914", letter: "N", laris: true, badge: "Paling Laris" },
+        { id: "spotify", name: "Spotify Premium Individual", cat: "Musik", dur: "3 sasi", price: 62000, was: 195000, garansi: "Garansi Full", desc: "Tanpa iklan, iso download, kualitas audio paling dhuwur. Aktivasi nang akunmu dhewe.", tileBg: "#123524", tileFg: "#1ed760", letter: "S", laris: true },
+        { id: "youtube", name: "YouTube Premium", cat: "Streaming", dur: "1 sasi", price: 18000, was: 59000, garansi: "Garansi 30 Dino", desc: "Tanpa iklan, iso muter nang background, kalebu YouTube Music Premium.", tileBg: "#2a0f0f", tileFg: "#ff4e45", letter: "Y" },
+        { id: "disney", name: "Disney+ Hotstar Premium", cat: "Streaming", dur: "1 sasi", price: 20000, was: 65000, garansi: "Garansi 30 Dino", desc: "Kabeh konten Disney, Marvel, Star Wars, sampek liga Inggris. Kualitas 4K.", tileBg: "#0d2242", tileFg: "#7cc4ff", letter: "D" },
+        { id: "vidio", name: "Vidio Platinum", cat: "Streaming", dur: "1 taun", price: 49000, was: 429000, garansi: "Garansi Full", desc: "Bola lokal & Eropa, sinetron, film Indonesia. Iso 2 piranti sekaligus.", tileBg: "#2b1052", tileFg: "#c9a7ff", letter: "V" },
+        { id: "applemusic", name: "Apple Music", cat: "Musik", dur: "3 sasi", price: 39000, was: 165000, garansi: "Garansi Full", desc: "Audio lossless + spatial audio, iso nang Android maupun iPhone.", tileBg: "#331118", tileFg: "#fa5c7c", letter: "A" },
+        { id: "canva", name: "Canva Pro", cat: "Desain", dur: "1 taun", price: 35000, was: 769000, garansi: "Garansi Full", desc: "Kabeh template premium, background remover, brand kit. Undangan via email sampeyan.", tileBg: "#0d2b33", tileFg: "#2fd4e8", letter: "C", laris: true },
+        { id: "capcut", name: "CapCut Pro", cat: "Desain", dur: "1 sasi", price: 15000, was: 89000, garansi: "Garansi 30 Dino", desc: "Efek & transisi premium, auto caption pro, cloud storage. Gawe konten satset.", tileBg: "#1c1c1e", tileFg: "#f2f2f2", letter: "Cc" },
+        { id: "lightroom", name: "Adobe Lightroom Premium", cat: "Desain", dur: "1 sasi", price: 22000, was: 129000, garansi: "Garansi 30 Dino", desc: "Preset premium, edit RAW, sync kabeh piranti. Gawe fotografer & konten kreator.", tileBg: "#0a2436", tileFg: "#31a8ff", letter: "Lr" },
+        { id: "chatgpt", name: "ChatGPT Plus", cat: "Produktivitas", dur: "1 sasi", price: 85000, was: 349000, garansi: "Garansi 30 Dino", desc: "Akses model paling anyar, respon luwih cepet, iso gawe gambar & analisis file.", tileBg: "#0c2b26", tileFg: "#4fe3c1", letter: "G", laris: true, badge: "Paling Laris" },
+        { id: "m365", name: "Microsoft 365 Personal", cat: "Produktivitas", dur: "1 taun", price: 95000, was: 959000, garansi: "Garansi Full", desc: "Word, Excel, PowerPoint + OneDrive 1TB. Aktivasi resmi nang akun Microsoft sampeyan.", tileBg: "#2b1a10", tileFg: "#ff8c42", letter: "M" },
+        { id: "notion", name: "Notion Plus", cat: "Produktivitas", dur: "1 taun", price: 55000, was: 1590000, garansi: "Garansi Full", desc: "Upload tanpa batas, riwayat versi 90 dino, Notion AI add-on kasedhiya. Gawe catetan tim.", tileBg: "#1e1e1e", tileFg: "#f5f5f5", letter: "N" }
+      ];
+
+      var CATEGORIES = ["Kabeh", "Streaming", "Musik", "Desain", "Produktivitas"];
+      var state = { filter: "Kabeh", query: "", cart: {}, lastOrder: null, detailId: null };
+      var timerId = null;
+
+      function rp(n) { return "Rp" + n.toLocaleString("id-ID"); }
+      function byId(id) { return document.getElementById(id); }
+      function productById(id) {
+        for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return PRODUCTS[i];
+        return null;
+      }
+
+      var toastTimer = null;
+      function toast(msg) {
+        var t = byId("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+      }
+
+      /* ---------- card builders ---------- */
+      function tagCard(p, mini) {
+        var card = document.createElement("article");
+        card.className = "tag-card" + (mini ? " mini" : "") + (p.badge && !mini ? " has-ribbon" : "");
+        var badge = p.badge && !mini ? '<span class="ribbon">' + p.badge.toUpperCase() + "</span>" : "";
+        card.innerHTML =
+          badge +
+          '<div class="tag-top">' +
+            '<div class="tile" style="background:' + p.tileBg + ";color:" + p.tileFg + '">' + p.letter + "</div>" +
+            "<div>" +
+              '<button type="button" class="tag-name-btn tag-name" data-detail="' + p.id + '">' + p.name + "</button>" +
+              '<div class="tag-dur">' + p.dur + " • " + p.cat + "</div>" +
+            "</div>" +
+          "</div>" +
+          (mini ? "" : '<p class="tag-desc">' + p.desc + "</p>") +
+          '<div class="price-row"><span class="price-was">' + rp(p.was) + '</span><span class="price-now">' + rp(p.price) + "</span></div>" +
+          '<div class="tag-foot"><span class="stamp">' + p.garansi + "</span>" +
+          '<button type="button" class="add-btn" data-add="' + p.id + '">+ Keranjang</button></div>';
+        return card;
+      }
+
+      function renderLaris() {
+        var grid = byId("laris-grid");
+        grid.innerHTML = "";
+        PRODUCTS.filter(function (p) { return p.laris; }).forEach(function (p) {
+          grid.appendChild(tagCard(p, true));
+        });
+      }
+
+      function renderCatalog() {
+        var grid = byId("catalog-grid");
+        grid.innerHTML = "";
+        var q = state.query.trim().toLowerCase();
+        var list = PRODUCTS.filter(function (p) {
+          var okCat = state.filter === "Kabeh" || p.cat === state.filter;
+          var okQ = !q || p.name.toLowerCase().indexOf(q) !== -1 || p.cat.toLowerCase().indexOf(q) !== -1;
+          return okCat && okQ;
+        });
+        if (!list.length) {
+          var d = document.createElement("div");
+          d.className = "empty-msg";
+          d.textContent = "Durung ono sing cocok, rek. Coba kata kunci liyane.";
+          grid.appendChild(d);
+          return;
+        }
+        list.forEach(function (p) { grid.appendChild(tagCard(p, false)); });
+      }
+
+      function renderChips() {
+        var box = byId("chips");
+        box.innerHTML = "";
+        CATEGORIES.forEach(function (c) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "chip";
+          b.textContent = c;
+          b.setAttribute("aria-pressed", state.filter === c ? "true" : "false");
+          b.addEventListener("click", function () {
+            state.filter = c;
+            renderChips();
+            renderCatalog();
+          });
+          box.appendChild(b);
+        });
+      }
+
+      /* ---------- cart ---------- */
+      function cartCount() {
+        var n = 0;
+        for (var k in state.cart) n += state.cart[k];
+        return n;
+      }
+      function cartTotal() {
+        var t = 0;
+        for (var k in state.cart) t += productById(k).price * state.cart[k];
+        return t;
+      }
+      function updateCartUI() {
+        var n = cartCount(), total = cartTotal();
+        byId("cart-count").textContent = n;
+        byId("cart-total").textContent = rp(total);
+        byId("checkout-btn").disabled = n === 0;
+        byId("mobile-total").textContent = rp(total);
+        byId("mobile-count").textContent = n + " barang nang keranjang";
+        byId("mobile-bar").classList.toggle("show", n > 0 && window.innerWidth <= 900);
+
+        var box = byId("cart-items");
+        box.innerHTML = "";
+        if (n === 0) {
+          var e = document.createElement("div");
+          e.className = "cart-empty";
+          e.innerHTML = "Keranjangmu kosong, rek.<br />Delok katalog dhisik, pilih akun sing mbok pengen.";
+          box.appendChild(e);
+          return;
+        }
+        for (var k in state.cart) {
+          (function (id) {
+            var p = productById(id);
+            var row = document.createElement("div");
+            row.className = "cart-item";
+            row.innerHTML =
+              '<div class="tile" style="background:' + p.tileBg + ";color:" + p.tileFg + '">' + p.letter + "</div>" +
+              '<div><div class="ci-name">' + p.name + '</div><div class="ci-price">' + rp(p.price) + " / akun</div></div>" +
+              '<div class="qty"><button type="button" data-dec="' + id + '" aria-label="Kurangi">−</button><b>' + state.cart[id] + '</b><button type="button" data-inc="' + id + '" aria-label="Tambah">+</button></div>';
+            box.appendChild(row);
+          })(k);
+        }
+      }
+      function addToCart(id) {
+        state.cart[id] = (state.cart[id] || 0) + 1;
+        updateCartUI();
+        toast(productById(id).name + " wis mlebu keranjang ✓");
+      }
+
+      /* ---------- drawer / modals ---------- */
+      function openDrawer() {
+        byId("cart-drawer").classList.add("show");
+        byId("overlay").classList.add("show");
+      }
+      function closeDrawer() {
+        byId("cart-drawer").classList.remove("show");
+        byId("overlay").classList.remove("show");
+      }
+      function openModal(id) { byId(id).classList.add("show"); }
+      function closeModal(id) {
+        byId(id).classList.remove("show");
+        if (id === "checkout-modal") stopTimer();
+      }
+
+      function openDetail(id) {
+        var p = productById(id);
+        if (!p) return;
+        state.detailId = id;
+        var tile = byId("detail-tile");
+        tile.textContent = p.letter;
+        tile.style.background = p.tileBg;
+        tile.style.color = p.tileFg;
+        byId("detail-name").textContent = p.name;
+        byId("detail-desc").textContent = p.desc;
+        byId("detail-dur").textContent = p.dur;
+        byId("detail-garansi").textContent = p.garansi;
+        byId("detail-cat").textContent = p.cat;
+        byId("detail-price").textContent = rp(p.price) + " (soko " + rp(p.was) + ")";
+        openModal("detail-modal");
+      }
+
+      /* ---------- fake QR (visual only) ---------- */
+      function fakeQR(seedText) {
+        var size = 21, cell = 9, svg = "";
+        var seed = 7;
+        for (var i = 0; i < seedText.length; i++) seed = (seed * 31 + seedText.charCodeAt(i)) % 9973;
+        function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+        function finder(x, y) {
+          var s = "";
+          s += '<rect x="' + x * cell + '" y="' + y * cell + '" width="' + 7 * cell + '" height="' + 7 * cell + '" fill="#33241a"/>';
+          s += '<rect x="' + (x + 1) * cell + '" y="' + (y + 1) * cell + '" width="' + 5 * cell + '" height="' + 5 * cell + '" fill="#fdf6e3"/>';
+          s += '<rect x="' + (x + 2) * cell + '" y="' + (y + 2) * cell + '" width="' + 3 * cell + '" height="' + 3 * cell + '" fill="#33241a"/>';
+          return s;
+        }
+        function inFinder(x, y) {
+          return (x < 8 && y < 8) || (x > size - 9 && y < 8) || (x < 8 && y > size - 9);
+        }
+        for (var y = 0; y < size; y++) {
+          for (var x = 0; x < size; x++) {
+            if (inFinder(x, y)) continue;
+            if (rnd() > 0.52) svg += '<rect x="' + x * cell + '" y="' + y * cell + '" width="' + cell + '" height="' + cell + '" fill="#33241a"/>';
+          }
+        }
+        svg += finder(0, 0) + finder(size - 7, 0) + finder(0, size - 7);
+        return '<svg width="' + size * cell + '" height="' + size * cell + '" viewBox="0 0 ' + size * cell + " " + size * cell + '" role="img" aria-label="Kode QR pembayaran (simulasi)"><rect width="100%" height="100%" fill="#fdf6e3"/>' + svg + "</svg>";
+      }
+
+      /* ---------- checkout ---------- */
+      function stopTimer() {
+        if (timerId) { clearInterval(timerId); timerId = null; }
+      }
+      function startTimer(code) {
+        stopTimer();
+        var left = 300;
+        var el = byId("qr-timer");
+        function tick() {
+          var m = Math.floor(left / 60), s = left % 60;
+          el.textContent = left > 0
+            ? "Kode entek nang " + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
+            : "Kode wis entek masa berlakune — tutup banjur gawe QR anyar.";
+          if (left <= 0) { stopTimer(); return; }
+          left--;
+        }
+        tick();
+        timerId = setInterval(tick, 1000);
+      }
+      function openCheckout() {
+        if (cartCount() === 0) { toast("Keranjangmu isih kosong, rek."); return; }
+        closeDrawer();
+        var code = "GK-" + Math.floor(100000 + Math.random() * 900000);
+        byId("checkout-pay-view").hidden = false;
+        byId("checkout-success-view").hidden = true;
+        byId("qr-slot").innerHTML = fakeQR(code + cartTotal());
+        byId("qr-total").textContent = rp(cartTotal());
+        byId("qr-code-line").textContent = "Kode pesanan: " + code + " • QRIS (simulasi)";
+        byId("paid-btn").disabled = false;
+        byId("paid-btn").innerHTML = "Wis Tak Bayar, Cek!";
+        byId("checkout-modal").dataset.orderCode = code;
+        openModal("checkout-modal");
+        startTimer(code);
+      }
+      function confirmPaid() {
+        var btn = byId("paid-btn");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>&nbsp; Ngecek pembayaran…';
+        setTimeout(function () {
+          stopTimer();
+          var code = byId("checkout-modal").dataset.orderCode;
+          state.lastOrder = { code: code, total: cartTotal(), status: "LUNAS — akun lagi disiapno admin" };
+          state.cart = {};
+          updateCartUI();
+          byId("success-code").textContent = code;
+          byId("checkout-pay-view").hidden = true;
+          byId("checkout-success-view").hidden = false;
+        }, 1300);
+      }
+
+      /* ---------- cek pesanan ---------- */
+      function checkOrder() {
+        var val = byId("order-input").value.trim().toUpperCase();
+        var res = byId("order-result");
+        res.classList.add("show");
+        if (!val) {
+          res.innerHTML = "Lebokno kode pesananmu dhisik, rek.";
+          return;
+        }
+        if (state.lastOrder && val === state.lastOrder.code) {
+          res.innerHTML = 'Status pesanan <b class="mono">' + val + '</b>: <span class="status-pill">' + state.lastOrder.status + '</span><br /><span style="color:var(--ink-soft)">Total: ' + rp(state.lastOrder.total) + ". Kredensial dikirim via chat admin nek stok lagi disiapno — sebutno kode iki.</span>";
+        } else {
+          res.innerHTML = 'Kode <b class="mono">' + val + "</b> durung ketemu. Iki mockup — pesanan sing iso dicek mung sing lagi wae mbok gawe nang sesi iki.";
+        }
+      }
+
+      /* ---------- marquee ---------- */
+      function buildMarquee() {
+        var items = ["Promo Oktober — Diskon sampek 96%", "Garansi sampek 30 Dino", "Bayar QRIS, Verifikasi Otomatis", "Akun Dikirim Bar Lunas", "Admin Fast Respon 08.00–22.00 WIB", "Rego Kaki Lima, Kualitas Bintang Lima"];
+        var chunk = items.map(function (t) { return "<span>" + t + "<i>✦</i></span>"; }).join("");
+        byId("marquee-track").innerHTML = chunk + chunk;
+      }
+
+      /* ---------- events ---------- */
+      document.addEventListener("click", function (ev) {
+        var add = ev.target.closest("[data-add]");
+        if (add) { addToCart(add.getAttribute("data-add")); return; }
+        var det = ev.target.closest("[data-detail]");
+        if (det) { openDetail(det.getAttribute("data-detail")); return; }
+        var inc = ev.target.closest("[data-inc]");
+        if (inc) { state.cart[inc.getAttribute("data-inc")]++; updateCartUI(); return; }
+        var dec = ev.target.closest("[data-dec]");
+        if (dec) {
+          var id = dec.getAttribute("data-dec");
+          state.cart[id]--;
+          if (state.cart[id] <= 0) delete state.cart[id];
+          updateCartUI();
+          return;
+        }
+        var closer = ev.target.closest("[data-close]");
+        if (closer) { closeModal(closer.getAttribute("data-close")); return; }
+        if (ev.target.classList.contains("modal")) ev.target.classList.remove("show");
+      });
+
+      byId("open-cart").addEventListener("click", openDrawer);
+      byId("mobile-open-cart").addEventListener("click", openDrawer);
+      byId("close-cart").addEventListener("click", closeDrawer);
+      byId("overlay").addEventListener("click", closeDrawer);
+      byId("checkout-btn").addEventListener("click", openCheckout);
+      byId("paid-btn").addEventListener("click", confirmPaid);
+      byId("success-close").addEventListener("click", function () { closeModal("checkout-modal"); });
+      byId("detail-add").addEventListener("click", function () {
+        if (state.detailId) { addToCart(state.detailId); closeModal("detail-modal"); openDrawer(); }
+      });
+      byId("search-input").addEventListener("input", function (ev) {
+        state.query = ev.target.value;
+        renderCatalog();
+      });
+      function openOrderModal(ev) {
+        ev.preventDefault();
+        byId("order-result").classList.remove("show");
+        openModal("order-modal");
+      }
+      byId("nav-cek-pesanan").addEventListener("click", openOrderModal);
+      byId("foot-cek-pesanan").addEventListener("click", openOrderModal);
+      byId("order-check-btn").addEventListener("click", checkOrder);
+      byId("order-input").addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter") checkOrder();
+      });
+      document.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape") {
+          closeDrawer();
+          ["detail-modal", "checkout-modal", "order-modal"].forEach(closeModal);
+        }
+      });
+      window.addEventListener("resize", updateCartUI);
+
+      /* ---------- init ---------- */
+      buildMarquee();
+      renderChips();
+      renderLaris();
+      renderCatalog();
+      updateCartUI();
+    </script>
+  </body>
+</html>

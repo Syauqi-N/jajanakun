@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.github
+.env
+.env*.local
+*.db
+*.db-journal
+prisma/*.db
+server.txt
+tsconfig.tsbuildinfo
+.dockerignore
+Dockerfile
+docker-compose*.yml
+uploads
