@@ -297,14 +297,14 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
                     <button
                       type="button"
                       onClick={() => setBigQr(qrSrc || order.qrImageUrl!)}
-                      style={{ display: "inline-block", background: "none", border: 0, padding: 8, cursor: "zoom-in" }}
+                      style={{ display: "block", width: "auto", margin: "0 auto", background: "none", border: 0, padding: 8, cursor: "zoom-in" }}
                       aria-label="Perbesar QRIS"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={qrSrc || order.qrImageUrl}
                         alt="QRIS pembayaran"
-                        style={{ display: "block", width: "min(300px, 100%)", aspectRatio: "1 / 1", height: "auto", objectFit: "contain", imageRendering: "pixelated" }}
+                        style={{ display: "block", width: "min(300px, 100%)", aspectRatio: "1 / 1", height: "auto", objectFit: "contain", imageRendering: "pixelated", margin: "0 auto" }}
                       />
                     </button>
                   </div>
