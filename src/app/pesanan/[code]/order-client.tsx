@@ -51,6 +51,59 @@ function fmt(secs: number) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+/**
+ * Ubah QR (PNG berlatar putih) menjadi PNG transparan:
+ * piksel putih jadi tembus pandang, modul gelap tetap hitam pekat.
+ * Berguna agar QR menyatu dengan latar kertas tanpa kotak putih.
+ */
+function useTransparentQr(src: string | null | undefined) {
+  const [out, setOut] = useState<string | null>(null);
+  useEffect(() => {
+    setOut(null);
+    if (!src) return;
+    let active = true;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (!active) return;
+      try {
+        const c = document.createElement("canvas");
+        c.width = img.naturalWidth;
+        c.height = img.naturalHeight;
+        const ctx = c.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0);
+        const data = ctx.getImageData(0, 0, c.width, c.height);
+        const px = data.data;
+        for (let i = 0; i < px.length; i += 4) {
+          const r = px[i], g = px[i + 1], b = px[i + 2];
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          if (lum > 190) {
+            // piksel terang -> transparan sepenuhnya
+            px[i + 3] = 0;
+          } else if (lum < 100) {
+            // modul gelap -> hitam pekat
+            px[i] = px[i + 1] = px[i + 2] = 0;
+            px[i + 3] = 255;
+          } else {
+            // tepi/abu -> semi transparan agar tetap tajam
+            px[i] = px[i + 1] = px[i + 2] = 0;
+            px[i + 3] = Math.max(0, Math.min(255, Math.round((190 - lum) / 90 * 255)));
+          }
+        }
+        ctx.putImageData(data, 0, 0);
+        if (active) setOut(c.toDataURL("image/png"));
+      } catch {
+        if (active) setOut(src);
+      }
+    };
+    img.onerror = () => { if (active) setOut(src); };
+    img.src = src;
+    return () => { active = false; };
+  }, [src]);
+  return out;
+}
+
 export default function OrderPage({ code, adminWa }: { code: string; adminWa: string }) {
   const [order, setOrder] = useState<OrderData | null>(null);
   const [error, setError] = useState("");
@@ -58,7 +111,11 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState("");
   const [bigQr, setBigQr] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // QR transparan (background putih dihapus) untuk tampilan menyatu dengan kertas.
+  const qrSrc = useTransparentQr(order?.qrImageUrl);
 
   const load = useCallback(async () => {
     try {
@@ -234,28 +291,60 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
               <p className="modal-sub">
                 Gunakan aplikasi e-wallet atau m-banking apa saja yang punya QRIS. Nominal sudah pas — jangan diubah.
               </p>
-              <div className="qr-frame">
+              <div className="qr-frame" style={{ textAlign: "center" }}>
                 {order.qrImageUrl ? (
-                  <button
-                    type="button"
-                    onClick={() => setBigQr(order.qrImageUrl!)}
-                    style={{ display: "block", margin: "0 auto 10px", background: "none", border: 0, padding: 0, cursor: "zoom-in" }}
-                    aria-label="Perbesar QRIS"
+                  <div
+                    style={{
+                      display: "inline-block",
+                      padding: 8,
+                      background: "#fff",
+                      borderRadius: 10,
+                      boxShadow: "0 2px 0 color-mix(in srgb, var(--ink) 18%, transparent)",
+                    }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={order.qrImageUrl}
-                      alt="QRIS pembayaran"
-                      style={{ display: "block", width: "min(300px, 100%)", aspectRatio: "1 / 1", height: "auto", objectFit: "contain", imageRendering: "pixelated" }}
-                    />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setBigQr(qrSrc || order.qrImageUrl!)}
+                      style={{ display: "block", background: "none", border: 0, padding: 0, cursor: "zoom-in" }}
+                      aria-label="Perbesar QRIS"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={qrSrc || order.qrImageUrl}
+                        alt="QRIS pembayaran"
+                        style={{ display: "block", width: "min(300px, 100%)", aspectRatio: "1 / 1", height: "auto", objectFit: "contain", imageRendering: "pixelated" }}
+                      />
+                    </button>
+                  </div>
                 ) : (
-                  <PaymentQr payload={order.qrString} />
+                  <div style={{ display: "inline-block", padding: 8, background: "#fff", borderRadius: 10 }}>
+                    <PaymentQr payload={order.qrString} />
+                  </div>
                 )}
                 {order.qrImageUrl && (
-                  <button type="button" className="btn btn-sm" style={{ margin: "0 auto 10px" }} onClick={() => setBigQr(order.qrImageUrl!)}>
-                    Perbesar QR
-                  </button>
+                  <div className="flex items-center justify-center gap-2 flex-wrap" style={{ marginTop: 10, marginBottom: 10 }}>
+                    <button type="button" className="btn btn-sm" onClick={() => setBigQr(qrSrc || order.qrImageUrl!)}>
+                      Perbesar QR
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      disabled={saving}
+                      onClick={() => {
+                        const href = qrSrc || order.qrImageUrl!;
+                        const a = document.createElement("a");
+                        a.href = href;
+                        a.download = `QRIS-${order.code}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        setSaving(true);
+                        setTimeout(() => setSaving(false), 800);
+                      }}
+                    >
+                      {saving ? "Tersimpan" : "Simpan QR"}
+                    </button>
+                  </div>
                 )}
                 <div className="mono" style={{ fontWeight: 700, fontSize: 21 }}>
                   {rp(order.amount)}
@@ -374,7 +463,31 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
             <img src={bigQr} alt="QRIS pembayaran" style={{ display: "block", width: "100%", maxWidth: 380, margin: "0 auto 12px", aspectRatio: "1 / 1", height: "auto", imageRendering: "pixelated" }} />
             <div className="mono" style={{ fontWeight: 700, fontSize: 24 }}>{order ? rp(order.amount) : ""}</div>
             <div className="mono" style={{ color: "#a52f22", fontWeight: 700, marginTop: 4, fontSize: 14 }}>Kode kedaluwarsa dalam {fmt(left)}</div>
-            <button type="button" className="btn mt-4 w-full" onClick={() => setBigQr(null)}>Tutup</button>
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                className="btn"
+                style={{ flex: 1 }}
+                onClick={() => setBigQr(null)}
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                className="btn btn-mustard"
+                style={{ flex: 1 }}
+                onClick={() => {
+                  const a = document.createElement("a");
+                  a.href = bigQr;
+                  a.download = `QRIS-${order?.code || "pesanan"}.png`;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                }}
+              >
+                Simpan QR
+              </button>
+            </div>
           </div>
         </div>
       )}
