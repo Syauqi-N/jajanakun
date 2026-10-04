@@ -6,10 +6,12 @@ import { Toast } from "@/components/toast";
 import { Catalog, FeaturedTabs, Marquee } from "@/components/catalog";
 import { getCatalogProducts } from "@/lib/products";
 import { adminWaLink } from "@/lib/utils";
+import { getSetting, SETTING_KEYS } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  const adminWa = await getSetting(SETTING_KEYS.adminWa);
   const products = await getCatalogProducts();
 
   return (
@@ -232,7 +234,7 @@ export default async function HomePage() {
               </div>
               <a
                 className="btn btn-green"
-                href={adminWaLink("Halo admin jajanakun.store, saya mau tanya...")}
+                href={adminWaLink("Halo admin jajanakun.store, saya mau tanya...", adminWa)}
                 target="_blank"
                 rel="noreferrer"
               >

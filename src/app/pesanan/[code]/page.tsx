@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CartDrawerServer } from "@/components/cart-drawer-server";
 import { Toast } from "@/components/toast";
 import OrderPage from "./order-client";
+import { getSetting, SETTING_KEYS } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function Page({ params }: { params: Promise<{ code: string 
   const owned = await prisma.order.findFirst({ where: { code: code.toUpperCase(), userId: user.id }, select: { id: true } });
   if (!owned) notFound();
   if (!/^GK-[A-Z0-9]{6}$/i.test(code)) notFound();
+  const adminWa = await getSetting(SETTING_KEYS.adminWa);
 
   return (
     <>
@@ -23,7 +25,7 @@ export default async function Page({ params }: { params: Promise<{ code: string 
       <CartDrawerServer />
       <Toast />
       <main>
-        <OrderPage code={code.toUpperCase()} />
+        <OrderPage code={code.toUpperCase()} adminWa={adminWa} />
       </main>
       <SiteFooter />
     </>

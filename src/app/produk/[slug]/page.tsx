@@ -8,10 +8,12 @@ import { ProductCard, ProductThumb, type ProductDTO } from "@/components/catalog
 import { BuyBox } from "./buy-box";
 import { getProductBySlug, getCatalogProducts } from "@/lib/products";
 import { adminWaLink, formatDateTime } from "@/lib/utils";
+import { getSetting, SETTING_KEYS } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const adminWa = await getSetting(SETTING_KEYS.adminWa);
   const { slug } = await params;
   const data = await getProductBySlug(slug);
   if (!data) notFound();
@@ -100,7 +102,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </ol>
               <a
                 className="btn btn-green btn-sm mt-3 inline-flex"
-                href={adminWaLink(`Halo admin, saya mau tanya soal ${dto.name}.`)}
+                href={adminWaLink(`Halo admin, saya mau tanya soal ${dto.name}.`, adminWa)}
                 target="_blank"
                 rel="noreferrer"
               >

@@ -51,7 +51,7 @@ function fmt(secs: number) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-export default function OrderPage({ code }: { code: string }) {
+export default function OrderPage({ code, adminWa }: { code: string; adminWa: string }) {
   const [order, setOrder] = useState<OrderData | null>(null);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -133,7 +133,7 @@ export default function OrderPage({ code }: { code: string }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mencatat klaim.");
       // Navigasi tab yang sama tidak diblokir popup blocker. Pesan belum dikirim sampai pembeli menekan Kirim di WhatsApp.
-      window.location.assign(adminWaLink(buildWaMessage(order)));
+      window.location.assign(adminWaLink(buildWaMessage(order), adminWa));
       await load();
     } catch (err) {
       setClaimError(err instanceof Error ? err.message : "Koneksi bermasalah. Silakan coba lagi.");
@@ -317,7 +317,7 @@ export default function OrderPage({ code }: { code: string }) {
                       {claiming ? "Memproses…" : "Klaim Akun via WhatsApp →"}
                     </button>
                   ) : (
-                    <a className="btn btn-mustard" href={adminWaLink(buildWaMessage(order))} target="_blank" rel="noreferrer">
+                    <a className="btn btn-mustard" href={adminWaLink(buildWaMessage(order), adminWa)} target="_blank" rel="noreferrer">
                       {delivered ? "Hubungi Admin" : "Buka WhatsApp Lagi →"}
                     </a>
                   )}

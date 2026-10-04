@@ -37,10 +37,11 @@ export function normalizeWa(input: string): string {
   return d;
 }
 
-// Link WhatsApp admin, opsional menyertakan kode pesanan
-export function adminWaLink(text?: string): string {
-  const num = process.env.NEXT_PUBLIC_ADMIN_WA || "6280000000000";
-  const base = `https://wa.me/${num}`;
+// Link WhatsApp admin. Nomor diambil dari pengaturan toko (DB) atau env.
+// `num` bila diisi akan dipakai; jika kosong, jatuh ke env NEXT_PUBLIC_ADMIN_WA.
+export function adminWaLink(text?: string, num?: string | null): string {
+  const n = (num || process.env.NEXT_PUBLIC_ADMIN_WA || "6280000000000").replace(/[^\d]/g, "");
+  const base = `https://wa.me/${n}`;
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 

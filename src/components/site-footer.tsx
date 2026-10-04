@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { adminWaLink } from "@/lib/utils";
+import { getSetting, SETTING_KEYS } from "@/lib/settings";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const adminWa = await getSetting(SETTING_KEYS.adminWa);
   return (
     <footer className="site-footer">
       <div className="wrap">
@@ -21,7 +23,7 @@ export function SiteFooter() {
         <div>
           <h4>Bantuan</h4>
           <Link href="/akun">Pesanan Saya</Link>
-          <a href={adminWaLink("Halo admin jajanakun.store, saya mau klaim garansi.")} target="_blank" rel="noreferrer">
+          <a href={adminWaLink("Halo admin jajanakun.store, saya mau klaim garansi.", adminWa)} target="_blank" rel="noreferrer">
             Klaim Garansi
           </a>
           <Link href="/#carabeli">Cara Pembayaran</Link>

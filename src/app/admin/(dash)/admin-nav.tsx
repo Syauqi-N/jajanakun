@@ -11,11 +11,14 @@ const LINKS = [
   { href: "/admin/pesanan", label: "Pesanan" },
   { href: "/admin/garansi", label: "Garansi" },
   { href: "/admin/laporan", label: "Laporan" },
+  { href: "/admin/pengaturan", label: "Pengaturan" },
+  { href: "/admin/admin", label: "Admin", superOnly: true },
 ];
 
-export function AdminNav() {
+export function AdminNav({ isSuper = false, adminEmail }: { isSuper?: boolean; adminEmail?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const links = LINKS.filter((l) => !l.superOnly || isSuper);
 
   return (
     <header className="admin-topbar">
@@ -26,7 +29,7 @@ export function AdminNav() {
         </Link>
 
         <nav className="admin-tabs">
-          {LINKS.map((l) => {
+          {links.map((l) => {
             const active = l.href === "/admin" ? pathname === "/admin" : pathname.startsWith(l.href);
             return (
               <Link key={l.href} href={l.href} className="admin-tab" aria-current={active ? "page" : undefined}>
@@ -53,7 +56,7 @@ export function AdminNav() {
 
       {open && (
         <nav className="admin-mobile-tabs">
-          {LINKS.map((l) => {
+          {links.map((l) => {
             const active = l.href === "/admin" ? pathname === "/admin" : pathname.startsWith(l.href);
             return (
               <Link
