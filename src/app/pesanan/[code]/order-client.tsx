@@ -293,11 +293,11 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
               </p>
               <div className="qr-frame" style={{ textAlign: "center" }}>
                 {order.qrImageUrl ? (
-                  <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div style={{ width: "100%", display: "block", textAlign: "center" }}>
                     <button
                       type="button"
                       onClick={() => setBigQr(qrSrc || order.qrImageUrl!)}
-                      style={{ display: "block", background: "none", border: 0, padding: 8, cursor: "zoom-in", margin: "0 auto" }}
+                      style={{ display: "inline-block", background: "none", border: 0, padding: 8, cursor: "zoom-in" }}
                       aria-label="Perbesar QRIS"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
