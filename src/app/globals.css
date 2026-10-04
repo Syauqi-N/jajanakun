@@ -1557,11 +1557,18 @@ table.gk tr:last-child td {
   color: #33241a;
   border: 2.5px solid var(--line);
   border-radius: 5px;
-  padding: 2px 8px;
+  padding: 5px 9px;
   font-family: "Space Mono", monospace;
   font-weight: 700;
   font-size: 11px;
+  line-height: 1;
   letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  flex: none;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .admin-tabs {
   display: flex;
