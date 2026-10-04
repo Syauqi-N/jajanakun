@@ -57,6 +57,7 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
   const [copied, setCopied] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState("");
+  const [bigQr, setBigQr] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const load = useCallback(async () => {
@@ -235,14 +236,26 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
               </p>
               <div className="qr-frame">
                 {order.qrImageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={order.qrImageUrl}
-                    alt="QRIS pembayaran"
-                    style={{ display: "block", margin: "0 auto 10px", width: 220, height: 220, objectFit: "contain" }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setBigQr(order.qrImageUrl!)}
+                    style={{ display: "block", margin: "0 auto 10px", background: "none", border: 0, padding: 0, cursor: "zoom-in" }}
+                    aria-label="Perbesar QRIS"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={order.qrImageUrl}
+                      alt="QRIS pembayaran"
+                      style={{ display: "block", width: "min(300px, 100%)", aspectRatio: "1 / 1", height: "auto", objectFit: "contain", imageRendering: "pixelated" }}
+                    />
+                  </button>
                 ) : (
                   <PaymentQr payload={order.qrString} />
+                )}
+                {order.qrImageUrl && (
+                  <button type="button" className="btn btn-sm" style={{ margin: "0 auto 10px" }} onClick={() => setBigQr(order.qrImageUrl!)}>
+                    Perbesar QR
+                  </button>
                 )}
                 <div className="mono" style={{ fontWeight: 700, fontSize: 21 }}>
                   {rp(order.amount)}
@@ -342,6 +355,29 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
           Lihat Pesanan Saya
         </Link>
       </div>
+
+      {bigQr && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setBigQr(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(20,12,6,.72)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="card"
+            style={{ width: "min(440px, 100%)", textAlign: "center", background: "#fff" }}
+          >
+            <h3 className="slab text-[20px] mb-2">Scan QRIS</h3>
+            <p className="modal-sub mb-3">Terangkan layar ke maksimal. Aplikasi e-wallet atau m-banking apa saja yang mendukung QRIS.</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bigQr} alt="QRIS pembayaran" style={{ display: "block", width: "100%", maxWidth: 380, margin: "0 auto 12px", aspectRatio: "1 / 1", height: "auto", imageRendering: "pixelated" }} />
+            <div className="mono" style={{ fontWeight: 700, fontSize: 24 }}>{order ? rp(order.amount) : ""}</div>
+            <div className="mono" style={{ color: "#a52f22", fontWeight: 700, marginTop: 4, fontSize: 14 }}>Kode kedaluwarsa dalam {fmt(left)}</div>
+            <button type="button" className="btn mt-4 w-full" onClick={() => setBigQr(null)}>Tutup</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -353,11 +389,11 @@ function PaymentQr({ payload }: { payload: string | null }) {
   useEffect(() => {
     let active = true;
     setSrc("");
-    if (!simulation && payload) QRCode.toDataURL(payload, { width: 260, margin: 2 })
+    if (!simulation && payload) QRCode.toDataURL(payload, { width: 512, margin: 2 })
       .then((url) => { if (active) setSrc(url); }).catch(() => {});
     return () => { active = false; };
   }, [payload, simulation]);
   if (simulation) return <p className="alert alert-warn">{payload?.startsWith("SIMQRIS") ? "Mode uji coba — QRIS pembayaran nyata belum dikonfigurasi. Jangan melakukan transfer." : "QRIS belum tersedia. Hubungi admin, jangan melakukan transfer dahulu."}</p>;
   if (!src) return <p>Menyiapkan kode QR…</p>;
-  return <img src={src} alt="QRIS pembayaran" width={260} height={260} style={{ margin: "0 auto 12px" }} />;
+  return <img src={src} alt="QRIS pembayaran" style={{ display: "block", margin: "0 auto 12px", width: "min(300px, 100%)", aspectRatio: "1 / 1", height: "auto" }} />;
 }
