@@ -1547,7 +1547,7 @@ table.gk tr:last-child td {
 .admin-topbar-inner {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 10px 24px;
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -1572,10 +1572,12 @@ table.gk tr:last-child td {
 }
 .admin-tabs {
   display: flex;
+  align-items: center;
   gap: 2px;
   flex: 1;
   overflow-x: auto;
   scrollbar-width: none;
+  padding: 4px 0;
 }
 .admin-tabs::-webkit-scrollbar {
   display: none;
