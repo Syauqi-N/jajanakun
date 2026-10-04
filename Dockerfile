@@ -6,7 +6,9 @@ WORKDIR /app
 # libc6-compat dibutuhkan sharp/prisma di Alpine.
 RUN apk add --no-cache libc6-compat openssl
 COPY package.json package-lock.json ./
-RUN npm ci
+# --ignore-scripts: lewati postinstall `prisma generate` di stage ini
+# (schema.prisma belum di-copy). Generate dijalankan di stage builder.
+RUN npm ci --ignore-scripts
 
 # ---------- builder: generate prisma client + build Next ----------
 FROM node:22-alpine AS builder
