@@ -10,8 +10,14 @@ if [ -z "$DATABASE_URL" ]; then
 fi
 
 # Sinkronkan skema ke DB. `db push` aman dijalankan tiap start untuk SQLite.
+# Panggil CLI Prisma langsung via node — `npx` tak menemukannya di image
+# standalone (folder node_modules/.bin tidak ikut di-copy).
 echo "[entrypoint] prisma db push ($DATABASE_URL)"
-npx prisma db push --skip-generate --accept-data-loss
+if [ -f /app/node_modules/prisma/build/index.js ]; then
+  node /app/node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss
+else
+  npx --yes prisma db push --skip-generate --accept-data-loss
+fi
 
 echo "[entrypoint] menjalankan server..."
 exec "$@"

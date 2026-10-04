@@ -29,7 +29,16 @@ services:
     # Hanya bind ke localhost: cloudflared di server yang meneruskan trafik.
     ports:
       - "127.0.0.1:8890:3000"
+    networks:
+      - default
+      # Agar bisa akses SoqiPG via http://soqipg-prod-app-1:3100
+      - soqipg
 
 volumes:
   jajanakun-data:
   jajanakun-uploads:
+
+networks:
+  soqipg:
+    external: true
+    name: soqipg-prod_default
