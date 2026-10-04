@@ -3,10 +3,9 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import { googleAvailable } from "./google-enabled";
 
-export function GoogleButton({ label }: { label: string }) {
-  const available = googleAvailable();
+export function GoogleButton({ label, enabled }: { label: string; enabled: boolean }) {
+  const available = enabled;
   if (!available) {
     return (
       <div
@@ -38,7 +37,7 @@ function GoogleIcon() {
   );
 }
 
-export function AuthForm({ mode }: { mode: "login" | "register" }) {
+export function AuthForm({ mode, googleEnabled = false }: { mode: "login" | "register"; googleEnabled?: boolean }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") || "/akun";
@@ -161,7 +160,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             <span className="h-0.5 flex-1" style={{ background: "color-mix(in srgb, var(--ink) 25%, transparent)" }} />
           </div>
 
-          <GoogleButton label={mode === "login" ? "Masuk dengan Google" : "Daftar dengan Google"} />
+          <GoogleButton label={mode === "login" ? "Masuk dengan Google" : "Daftar dengan Google"} enabled={googleEnabled} />
 
           <p className="kirim-note" style={{ marginTop: 18 }}>
             {mode === "login" ? (

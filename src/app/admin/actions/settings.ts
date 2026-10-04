@@ -83,6 +83,7 @@ export async function saveSettings(formData: FormData) {
   await setSetting(SETTING_KEYS.storeName, String(formData.get("store_name") || ""));
   await setSetting(SETTING_KEYS.storeTagline, String(formData.get("store_tagline") || ""));
   await setSetting(SETTING_KEYS.storeAddress, String(formData.get("store_address") || ""));
+  await setSetting(SETTING_KEYS.googleEnabled, formData.get("google_enabled") ? "1" : "0");
 
   revalidatePath("/admin/pengaturan");
   revalidatePath("/", "layout");

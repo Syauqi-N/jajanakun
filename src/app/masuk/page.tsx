@@ -6,12 +6,14 @@ import { CartDrawerServer } from "@/components/cart-drawer-server";
 import { Toast } from "@/components/toast";
 import { AuthForm } from "@/components/auth-form";
 import { getCurrentUser } from "@/lib/user-auth";
+import { googleEnabled } from "@/lib/google-enabled";
 
 export const dynamic = "force-dynamic";
 
 export default async function MasukPage() {
   const user = await getCurrentUser();
   if (user) redirect("/akun");
+  const googleOk = await googleEnabled();
 
   return (
     <>
@@ -20,7 +22,7 @@ export default async function MasukPage() {
       <Toast />
       <main>
         <Suspense fallback={<div className="wrap py-16 text-center mono">Memuat…</div>}>
-          <AuthForm mode="login" />
+          <AuthForm mode="login" googleEnabled={googleOk} />
         </Suspense>
       </main>
       <SiteFooter />

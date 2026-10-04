@@ -11,6 +11,7 @@ export const SETTING_KEYS = {
   storeName: "store_name",
   storeTagline: "store_tagline",
   storeAddress: "store_address",
+  googleEnabled: "google_enabled",
 } as const;
 
 const FALLBACK: Record<string, string> = {

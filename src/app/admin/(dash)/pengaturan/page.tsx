@@ -58,6 +58,17 @@ export default async function AdminPengaturanPage() {
           />
         </label>
 
+        <label className="field flex items-center gap-3" style={{ flexDirection: "row", alignItems: "center" }}>
+          <input
+            type="checkbox"
+            name="google_enabled"
+            value="1"
+            defaultChecked={s[SETTING_KEYS.googleEnabled] === "1"}
+            style={{ width: 20, height: 20 }}
+          />
+          <span style={{ margin: 0 }}>Aktifkan tombol “Masuk dengan Google”</span>
+        </label>
+
         <button className="btn btn-green mt-2" type="submit">
           Simpan Pengaturan
         </button>
