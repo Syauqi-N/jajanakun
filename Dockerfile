@@ -20,6 +20,8 @@ COPY . .
 ENV DATABASE_URL="file:./dev.db"
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate && npm run build
+# Kumpulkan prisma CLI + dependensinya ke ./prisma-cli (untuk `db push` di runner).
+RUN node scripts/bundle-prisma-cli.mjs
 
 # ---------- runner: image runtime ramping ----------
 FROM node:22-alpine AS runner
@@ -37,11 +39,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma: schema + CLI (engine) untuk `db push` saat kontainer mulai.
+# Prisma: schema + CLI mandiri (dependensi lengkap) untuk `db push` saat start.
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/prisma-cli/node_modules ./prisma-cli/node_modules
 
 # Skrip entri: siapkan folder data (DB + uploads) lalu jalankan server.
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh

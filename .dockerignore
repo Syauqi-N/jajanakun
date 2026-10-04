@@ -13,3 +13,4 @@ tsconfig.tsbuildinfo
 Dockerfile
 docker-compose*.yml
 uploads
+prisma-cli

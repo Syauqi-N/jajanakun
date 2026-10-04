@@ -13,8 +13,9 @@ fi
 # Panggil CLI Prisma langsung via node — `npx` tak menemukannya di image
 # standalone (folder node_modules/.bin tidak ikut di-copy).
 echo "[entrypoint] prisma db push ($DATABASE_URL)"
-if [ -f /app/node_modules/prisma/build/index.js ]; then
-  node /app/node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss
+PRISMA_CLI="/app/prisma-cli/node_modules/prisma/build/index.js"
+if [ -f "$PRISMA_CLI" ]; then
+  node "$PRISMA_CLI" db push --skip-generate --accept-data-loss
 else
   npx --yes prisma db push --skip-generate --accept-data-loss
 fi
