@@ -59,7 +59,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {dto.badge && <span className="ribbon" style={{ position: "static", display: "inline-block", marginBottom: 10, transform: "rotate(-2deg)" }}>{dto.badge.toUpperCase()}</span>}
             {dto.isPreOrder && <span className="po-badge" style={{ marginBottom: 10 }}>PRE-ORDER • {dto.poEta || "1-3 hari kerja"}</span>}
             <h1 className="slab text-[28px] leading-tight">{dto.name}</h1>
-            <p style={{ color: "var(--ink-soft)", marginTop: 8 }}>{dto.description}</p>
 
             <div className="price-row mt-5">
               {dto.priceWas ? <span className="price-was">{`Rp${dto.priceWas.toLocaleString("id-ID")}`}</span> : null}
@@ -111,6 +110,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         </div>
+
+        {dto.description?.trim() && (
+          <section className="block" style={{ marginTop: 28 }}>
+            <div className="sec-head">
+              <p className="sec-kicker">Detail</p>
+              <h2>Deskripsi Produk</h2>
+            </div>
+            <div className="card" style={{ maxWidth: 860 }}>
+              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 15, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                {dto.description.trim()}
+              </p>
+            </div>
+          </section>
+        )}
 
         {others.length > 0 && (
           <section className="block">
