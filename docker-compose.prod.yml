@@ -17,10 +17,10 @@ services:
       DATABASE_URL: "file:/app/data/prod.db"
       NODE_ENV: "production"
       PORT: "3000"
-      # Penting di balik Cloudflare Tunnel: tanpa ini Next.js membangun URL
-      # redirect (termasuk server action) dari host internal container
-      # (0.0.0.0:3000) sehingga submit form admin bisa nyasar ke host salah.
-      HOSTNAME: "jajanakun.store"
+      # CATATAN: JANGAN ubah HOSTNAME — dipakai Next standalone untuk alamat
+      # bind (harus 0.0.0.0). Redirect server action mengandalkan
+      # experimental.serverActions.allowedOrigins + X-Forwarded-Host dari
+      # Cloudflare Tunnel, bukan HOSTNAME.
       # WAJIB diisi di .env produksi:
       #   NEXT_PUBLIC_APP_URL=https://jajanakun.store
       #   ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
