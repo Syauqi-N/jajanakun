@@ -6,12 +6,13 @@ import { Toast } from "@/components/toast";
 import { Catalog, FeaturedTabs, Marquee } from "@/components/catalog";
 import { getCatalogProducts } from "@/lib/products";
 import { adminWaLink } from "@/lib/utils";
-import { getSetting, SETTING_KEYS } from "@/lib/settings";
+import { getSetting, SETTING_KEYS, parseMarquee } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const adminWa = await getSetting(SETTING_KEYS.adminWa);
+  const marqueeItems = parseMarquee(await getSetting(SETTING_KEYS.marqueeItems));
   const products = await getCatalogProducts();
 
   return (
@@ -71,7 +72,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <Marquee />
+        <Marquee items={marqueeItems} />
 
         {/* KATALOG */}
         <section className="block" id="katalog">

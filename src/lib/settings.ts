@@ -12,13 +12,33 @@ export const SETTING_KEYS = {
   storeTagline: "store_tagline",
   storeAddress: "store_address",
   googleEnabled: "google_enabled",
+  marqueeItems: "marquee_items",
 } as const;
+
+/** Teks running banner default (dipakai bila admin belum mengubah). */
+export const DEFAULT_MARQUEE = [
+  "Promo Oktober — Diskon sampai 96%",
+  "Garansi sampai 30 Hari",
+  "Bayar QRIS, Verifikasi Otomatis",
+  "Akun Dikirim Setelah Lunas",
+  "Admin Fast Respon 08.00–22.00 WIB",
+  "Harga Kaki Lima, Kualitas Bintang Lima",
+];
+
+/** Pisah isi setting marquee (satu per baris atau dipisah tanda |) menjadi daftar. */
+export function parseMarquee(value: string): string[] {
+  return (value || "")
+    .split(/\r?\n|\|/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
 
 const FALLBACK: Record<string, string> = {
   [SETTING_KEYS.adminWa]: process.env.NEXT_PUBLIC_ADMIN_WA || "6280000000000",
   [SETTING_KEYS.storeName]: "jajanakun.store",
   [SETTING_KEYS.storeTagline]: "Warung Akun Premium",
   [SETTING_KEYS.storeAddress]: "",
+  [SETTING_KEYS.marqueeItems]: DEFAULT_MARQUEE.join("\n"),
 };
 
 /** Ambil satu pengaturan; jatuh ke default env/konstanta bila belum diisi. */

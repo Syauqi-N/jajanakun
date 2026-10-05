@@ -9,6 +9,7 @@ export default async function AdminPengaturanPage() {
     SETTING_KEYS.storeName,
     SETTING_KEYS.storeTagline,
     SETTING_KEYS.storeAddress,
+    SETTING_KEYS.marqueeItems,
   ]);
 
   return (
@@ -56,6 +57,20 @@ export default async function AdminPengaturanPage() {
             defaultValue={s[SETTING_KEYS.storeAddress]}
             placeholder="mis. Surabaya, Indonesia"
           />
+        </label>
+
+        <label className="field">
+          <span>Teks Running Banner (promo)</span>
+          <textarea
+            className="textarea mono"
+            name="marquee_items"
+            rows={6}
+            defaultValue={s[SETTING_KEYS.marqueeItems]}
+            placeholder={"Promo Oktober — Diskon sampai 96%\nGaransi sampai 30 Hari"}
+          />
+          <small style={{ color: "var(--ink-soft)" }}>
+            Satu kalimat per baris. Teks ini berjalan di banner merah di halaman utama.
+          </small>
         </label>
 
         <label className="field flex items-center gap-3" style={{ flexDirection: "row", alignItems: "center" }}>

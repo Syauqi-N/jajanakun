@@ -351,15 +351,18 @@ export function PreOrderSection({ products }: { products: ProductDTO[] }) {
   );
 }
 
-export function Marquee() {
-  const items = [
-    "Promo Oktober — Diskon sampai 96%",
-    "Garansi sampai 30 Hari",
-    "Bayar QRIS, Verifikasi Otomatis",
-    "Akun Dikirim Setelah Lunas",
-    "Admin Fast Respon 08.00–22.00 WIB",
-    "Harga Kaki Lima, Kualitas Bintang Lima",
-  ];
+export function Marquee({ items: itemsProp }: { items?: string[] } = {}) {
+  const items =
+    itemsProp && itemsProp.length > 0
+      ? itemsProp
+      : [
+          "Promo Oktober — Diskon sampai 96%",
+          "Garansi sampai 30 Hari",
+          "Bayar QRIS, Verifikasi Otomatis",
+          "Akun Dikirim Setelah Lunas",
+          "Admin Fast Respon 08.00–22.00 WIB",
+          "Harga Kaki Lima, Kualitas Bintang Lima",
+        ];
   const chunk = [...items, ...items];
   return (
     <div className="marquee" aria-hidden="true">
