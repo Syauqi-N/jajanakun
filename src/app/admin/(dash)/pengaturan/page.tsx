@@ -1,9 +1,13 @@
 import { getSettings, SETTING_KEYS } from "@/lib/settings";
-import { saveSettings } from "../../actions/settings";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPengaturanPage() {
+export default async function AdminPengaturanPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ok?: string; error?: string }>;
+}) {
+  const sp = await searchParams;
   const s = await getSettings([
     SETTING_KEYS.adminWa,
     SETTING_KEYS.storeName,
@@ -19,7 +23,19 @@ export default async function AdminPengaturanPage() {
         Perubahan langsung berlaku di seluruh halaman toko — tanpa perlu build ulang.
       </p>
 
-      <form action={saveSettings} className="card" style={{ maxWidth: 620 }}>
+      <form action="/admin/pengaturan/save" method="post" className="card" style={{ maxWidth: 620 }}>
+        {sp.ok && (
+          <div className="alert alert-success" style={{ marginBottom: 16 }}>
+            <strong>Berhasil</strong>
+            Pengaturan tersimpan.
+          </div>
+        )}
+        {sp.error === "wa" && (
+          <div className="alert alert-error" style={{ marginBottom: 16 }}>
+            <strong>Gagal</strong>
+            Nomor WhatsApp tidak valid.
+          </div>
+        )}
         <label className="field">
           <span>Nomor WhatsApp Admin (wajib)</span>
           <input
