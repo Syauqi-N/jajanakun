@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatDateTime } from "@/lib/utils";
-import { resolveClaimManual, rejectClaim, openClaim } from "../../actions/data";
+import { AdminForm } from "@/components/admin-form";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,7 @@ export default async function AdminGaransiPage() {
     <div>
       <h1 className="slab mb-6 text-[26px]">Klaim Garansi</h1>
 
-      <form action={openClaim} className="card mb-8">
+      <AdminForm action="openClaim" className="card mb-8">
         <h3 className="slab mb-3 text-[19px]">Buat Klaim Manual</h3>
         <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
           <label className="field" style={{ marginBottom: 0 }}>
@@ -53,7 +53,7 @@ export default async function AdminGaransiPage() {
         <p className="kirim-note" style={{ textAlign: "left", marginTop: 10 }}>
           Klaim dicatat untuk produk pertama pesanan. Kirim penggantian melalui WhatsApp, lalu isi catatan penyelesaian.
         </p>
-      </form>
+      </AdminForm>
 
       <h2 className="slab mb-3 text-[20px]">Klaim Masuk ({open.length})</h2>
       {open.length === 0 ? (
@@ -76,19 +76,19 @@ export default async function AdminGaransiPage() {
               </div>
               <p style={{ margin: "0 0 12px", fontSize: 14 }}>Alasan: {c.reason}</p>
               <div className="flex flex-wrap gap-2">
-                <form action={resolveClaimManual} className="flex flex-wrap items-center gap-2">
+                <AdminForm action="resolveClaimManual" className="flex flex-wrap items-center gap-2">
                   <input type="hidden" name="id" value={c.id} />
                   <input className="input" name="resolution" placeholder="Catatan penyelesaian" style={{ width: 220, padding: "6px 10px" }} />
                   <button className="btn btn-sm btn-mustard" type="submit">
                     Selesaikan Manual
                   </button>
-                </form>
-                <form action={rejectClaim}>
+                </AdminForm>
+                <AdminForm action="rejectClaim" confirmText="Tolak klaim ini?">
                   <input type="hidden" name="id" value={c.id} />
                   <button className="btn btn-sm btn-red" type="submit">
                     Tolak
                   </button>
-                </form>
+                </AdminForm>
               </div>
             </div>
           ))}

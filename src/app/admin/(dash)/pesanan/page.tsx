@@ -2,7 +2,7 @@ import Link from "next/link";
 import { preOrderReadiness } from "@/lib/preorder";
 import { prisma } from "@/lib/prisma";
 import { rp, formatDateTime, normalizeWa } from "@/lib/utils";
-import { markPaidManual, markDeliveredManual, reopenOrder, cancelOrder } from "../../actions/data";
+import { AdminForm } from "@/components/admin-form";
 
 export const dynamic = "force-dynamic";
 
@@ -118,44 +118,44 @@ export default async function AdminPesananPage({ searchParams }: { searchParams:
               {isPo && <p className="po-banner mb-3">{poState.ready ? "Batch PO siap dikirim manual." : poState.pending.join(" • ")}</p>}
               <div className="flex flex-wrap gap-2">
                 {o.status === "PENDING" && (
-                  <form action={markPaidManual}>
+                  <AdminForm action="markPaidManual">
                     <input type="hidden" name="id" value={o.id} />
                     <button className="btn btn-sm btn-green" type="submit">
                       Tandai Lunas Manual
                     </button>
-                  </form>
+                  </AdminForm>
                 )}
                 {(o.status === "PAID" || o.status === "CLAIMED") && (
-                  <form action={markDeliveredManual}>
+                  <AdminForm action="markDeliveredManual">
                     <input type="hidden" name="id" value={o.id} />
                     <button className="btn btn-sm btn-green" type="submit" disabled={!poState.ready}>
                       ✓ Tandai Sudah Dikirim
                     </button>
-                  </form>
+                  </AdminForm>
                 )}
                 {o.status === "DELIVERED" && (
-                  <form action={reopenOrder}>
+                  <AdminForm action="reopenOrder">
                     <input type="hidden" name="id" value={o.id} />
                     <button className="btn btn-sm" type="submit">
                       ↺ Buka Lagi (belum terkirim)
                     </button>
-                  </form>
+                  </AdminForm>
                 )}
                 {o.status !== "CANCELLED" && o.status !== "REFUNDED" && (
                   <>
-                    {o.status === "PENDING" && <form action={cancelOrder}>
+                    {o.status === "PENDING" && <AdminForm action="cancelOrder" confirmText="Batalkan pesanan ini?">
                       <input type="hidden" name="id" value={o.id} />
                       <button className="btn btn-sm" type="submit">
                         Batalkan
                       </button>
-                    </form>}
-                    {o.status !== "PENDING" && <form action={cancelOrder}>
+                    </AdminForm>}
+                    {o.status !== "PENDING" && <AdminForm action="cancelOrder" confirmText="Tandai dana sudah dikembalikan ke pembeli?">
                       <input type="hidden" name="id" value={o.id} />
                       <input type="hidden" name="refund" value="1" />
                       <button className="btn btn-sm btn-red" type="submit">
                         Tandai Dana Dikembalikan
                       </button>
-                    </form>}
+                    </AdminForm>}
                   </>
                 )}
                 {buyerWa && <a

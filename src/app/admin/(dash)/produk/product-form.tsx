@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { saveProduct } from "../../actions/data";
+import { useRouter } from "next/navigation";
 
 type Category = { id: string; name: string };
 export type ProductFormValues = {
@@ -35,6 +35,7 @@ export function ProductForm({ categories, initial }: { categories: Category[]; i
   const [uploadErr, setUploadErr] = useState("");
   const [isPo, setIsPo] = useState(Boolean(initial?.isPreOrder));
   const fileRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const isEdit = Boolean(initial?.id);
 
   const onPickFile = async (file: File | null) => {
@@ -70,10 +71,22 @@ export function ProductForm({ categories, initial }: { categories: Category[]; i
       if (uploading || saving) return;
       setSaving(true); setError("");
       const fd = new FormData(e.currentTarget);
-      try { await saveProduct(fd); window.location.assign("/admin/produk"); }
+      fd.set("_name", "saveProduct");
+      fd.set("_redirect", "/admin/produk");
+      try {
+        const res = await fetch("/admin/action", { method: "POST", body: fd, redirect: "manual" });
+        if (res.type === "opaqueredirect" || res.status === 0 || res.ok || res.status === 303) {
+          setOpen(false);
+          router.refresh();
+        } else {
+          setError("Gagal menyimpan. Periksa harga, kategori, dan batas waktu PO.");
+          setSaving(false);
+        }
+      }
       catch { setError("Gagal menyimpan. Periksa harga, kategori, dan batas waktu PO."); setSaving(false); }
     }} className="card mb-6" style={{ display: "grid", gap: 4 }}>
       {error && <p className="alert alert-error" role="alert">{error}</p>}
+      <input type="hidden" name="_name" value="saveProduct" />
       {initial?.id && <input type="hidden" name="id" value={initial.id} />}
       <input type="hidden" name="imageUrl" value={imageUrl} />
       <div className="mb-4 flex items-center justify-between">

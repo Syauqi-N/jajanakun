@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { rp } from "@/lib/utils";
 import { ProductForm } from "./product-form";
-import { deleteProduct, toggleProductActive } from "../../actions/data";
+import { AdminForm } from "@/components/admin-form";
 
 export const dynamic = "force-dynamic";
 
@@ -73,12 +73,12 @@ export default async function AdminProdukPage() {
                 </td>
                 <td>
                   <div className="flex flex-wrap gap-1.5">
-                    <form action={toggleProductActive}>
+                    <AdminForm action="toggleProductActive">
                       <input type="hidden" name="id" value={p.id} />
                       <button className="btn btn-sm" type="submit">
                         {p.active ? "Nonaktifkan" : "Aktifkan"}
                       </button>
-                    </form>
+                    </AdminForm>
                     <details>
                       <summary className="btn btn-sm btn-mustard" style={{ listStyle: "none", display: "inline-flex" }}>
                         Edit
@@ -110,12 +110,12 @@ export default async function AdminProdukPage() {
                         />
                       </div>
                     </details>
-                    <form action={deleteProduct}>
+                    <AdminForm action="deleteProduct" confirmText="Hapus produk ini?">
                       <input type="hidden" name="id" value={p.id} />
                       <button className="btn btn-sm btn-red" type="submit">
                         Hapus
                       </button>
-                    </form>
+                    </AdminForm>
                   </div>
                 </td>
               </tr>

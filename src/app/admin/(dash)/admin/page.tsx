@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isSuperAdmin } from "@/lib/auth";
-import { deleteAdmin, toggleAdmin } from "../../actions/settings";
+import { AdminForm } from "@/components/admin-form";
 import { AdminCreateForm } from "./admin-create-form";
 
 export const dynamic = "force-dynamic";
@@ -45,18 +45,18 @@ export default async function AdminListPage() {
                     <span style={{ color: "var(--ink-soft)" }}>—</span>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <form action={toggleAdmin}>
+                      <AdminForm action="toggleAdmin">
                         <input type="hidden" name="id" value={a.id} />
                         <button className="btn btn-sm" type="submit">
                           {a.active ? "Nonaktifkan" : "Aktifkan"}
                         </button>
-                      </form>
-                      <form action={deleteAdmin}>
+                      </AdminForm>
+                      <AdminForm action="deleteAdmin" confirmText="Hapus admin ini?">
                         <input type="hidden" name="id" value={a.id} />
                         <button className="btn btn-sm btn-red" type="submit">
                           Hapus
                         </button>
-                      </form>
+                      </AdminForm>
                     </div>
                   )}
                 </td>

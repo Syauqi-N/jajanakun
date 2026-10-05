@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { saveCategory, deleteCategory } from "../../actions/data";
+import { AdminForm } from "@/components/admin-form";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export default async function AdminKategoriPage() {
     <div>
       <h1 className="slab mb-6 text-[26px]">Kategori</h1>
 
-      <form action={saveCategory} className="card mb-6 flex flex-wrap items-end gap-4">
+      <AdminForm action="saveCategory" className="card mb-6 flex flex-wrap items-end gap-4">
         <label className="field" style={{ marginBottom: 0, flex: "1 1 200px" }}>
           <span>Nama Kategori Baru</span>
           <input className="input" name="name" placeholder="mis. Streaming" required />
@@ -25,7 +25,7 @@ export default async function AdminKategoriPage() {
         <button className="btn btn-green" type="submit">
           + Tambah
         </button>
-      </form>
+      </AdminForm>
 
       <div className="table-wrap">
         <table className="gk">
@@ -47,23 +47,23 @@ export default async function AdminKategoriPage() {
                 <td className="mono">{c.slug}</td>
                 <td>{c._count.products}</td>
                 <td>
-                  <form action={saveCategory} className="flex items-center gap-2">
+                  <AdminForm action="saveCategory" className="flex items-center gap-2">
                     <input type="hidden" name="id" value={c.id} />
                     <input type="hidden" name="name" value={c.name} />
                     <input className="input" name="order" type="number" defaultValue={c.order} style={{ width: 72, padding: "6px 9px" }} />
                     <button className="btn btn-sm" type="submit">
                       Simpan
                     </button>
-                  </form>
+                  </AdminForm>
                 </td>
                 <td>
                   {c._count.products === 0 ? (
-                    <form action={deleteCategory}>
+                    <AdminForm action="deleteCategory" confirmText="Hapus kategori ini?">
                       <input type="hidden" name="id" value={c.id} />
                       <button className="btn btn-sm btn-red" type="submit">
                         Hapus
                       </button>
-                    </form>
+                    </AdminForm>
                   ) : (
                     <span className="badge">Dipakai</span>
                   )}
