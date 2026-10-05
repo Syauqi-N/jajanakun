@@ -17,10 +17,10 @@ services:
       DATABASE_URL: "file:/app/data/prod.db"
       NODE_ENV: "production"
       PORT: "3000"
-      # CATATAN: JANGAN ubah HOSTNAME — dipakai Next standalone untuk alamat
-      # bind (harus 0.0.0.0). Redirect server action mengandalkan
-      # experimental.serverActions.allowedOrigins + X-Forwarded-Host dari
-      # Cloudflare Tunnel, bukan HOSTNAME.
+      # Host publik yang dipakai Next untuk membangun URL redirect (req.url)
+      # di balik Cloudflare Tunnel. Entrypoint memakai nilai ini sebagai
+      # HOSTNAME (untuk URL) tapi tetap bind ke 0.0.0.0.
+      PUBLIC_HOSTNAME: "jajanakun.store"
       # WAJIB diisi di .env produksi:
       #   NEXT_PUBLIC_APP_URL=https://jajanakun.store
       #   ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
