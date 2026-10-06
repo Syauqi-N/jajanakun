@@ -39,14 +39,16 @@ export function AdminForm({
     const fd = new FormData(form);
     fd.set("_name", action);
     fd.set("_redirect", redirect || window.location.pathname);
+    fd.set("_json", "1");
     try {
-      const res = await fetch("/admin/action", { method: "POST", body: fd, redirect: "manual" });
-      if (res.type === "opaqueredirect" || res.ok || res.status === 0 || res.status === 303) {
+      const res = await fetch("/admin/action", { method: "POST", body: fd });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.ok) {
         // Sukses — muat ulang data halaman.
         router.refresh();
         form.reset();
       } else {
-        alert("Gagal menyimpan. Coba lagi.");
+        alert(data?.error || "Gagal menyimpan. Coba lagi.");
       }
     } catch {
       alert("Koneksi bermasalah. Coba lagi.");

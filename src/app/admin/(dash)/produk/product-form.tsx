@@ -26,8 +26,34 @@ export type ProductFormValues = {
   poEndsAt?: string | null;
 };
 
-export function ProductForm({ categories, initial }: { categories: Category[]; initial?: ProductFormValues }) {
+type FormProps = { categories: Category[]; initial?: ProductFormValues };
+
+export function ProductForm({ categories, initial }: FormProps) {
   const [open, setOpen] = useState(Boolean(initial?.id));
+  // Ganti key tiap kali form dibuka agar state (saving, gambar, PO) selalu mulai
+  // bersih dan memakai data `initial` terbaru setelah router.refresh().
+  const [formKey, setFormKey] = useState(0);
+  const isEdit = Boolean(initial?.id);
+
+  if (!open) {
+    return (
+      <button
+        className="btn btn-red mb-5"
+        type="button"
+        onClick={() => {
+          setFormKey((k) => k + 1);
+          setOpen(true);
+        }}
+      >
+        {isEdit ? "Edit Produk" : "+ Tambah Produk"}
+      </button>
+    );
+  }
+
+  return <ProductFormBody key={formKey} categories={categories} initial={initial} onClose={() => setOpen(false)} />;
+}
+
+function ProductFormBody({ categories, initial, onClose }: FormProps & { onClose: () => void }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
@@ -37,6 +63,7 @@ export function ProductForm({ categories, initial }: { categories: Category[]; i
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const isEdit = Boolean(initial?.id);
+  const fallbackError = "Gagal menyimpan. Periksa harga, kategori, dan batas waktu PO.";
 
   const onPickFile = async (file: File | null) => {
     if (!file) return;
@@ -57,14 +84,6 @@ export function ProductForm({ categories, initial }: { categories: Category[]; i
     }
   };
 
-  if (!open) {
-    return (
-      <button className="btn btn-red mb-5" type="button" onClick={() => setOpen(true)}>
-        {isEdit ? "Edit Produk" : "+ Tambah Produk"}
-      </button>
-    );
-  }
-
   return (
     <form onSubmit={async (e) => {
       e.preventDefault();
@@ -72,18 +91,20 @@ export function ProductForm({ categories, initial }: { categories: Category[]; i
       setSaving(true); setError("");
       const fd = new FormData(e.currentTarget);
       fd.set("_name", "saveProduct");
-      fd.set("_redirect", "/admin/produk");
+      fd.set("_json", "1");
       try {
-        const res = await fetch("/admin/action", { method: "POST", body: fd, redirect: "manual" });
-        if (res.type === "opaqueredirect" || res.status === 0 || res.ok || res.status === 303) {
-          setOpen(false);
+        const res = await fetch("/admin/action", { method: "POST", body: fd });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.ok) {
+          onClose();
           router.refresh();
-        } else {
-          setError("Gagal menyimpan. Periksa harga, kategori, dan batas waktu PO.");
-          setSaving(false);
+          return;
         }
+        setError(data?.error || fallbackError);
+      } catch {
+        setError(fallbackError);
       }
-      catch { setError("Gagal menyimpan. Periksa harga, kategori, dan batas waktu PO."); setSaving(false); }
+      setSaving(false);
     }} className="card mb-6" style={{ display: "grid", gap: 4 }}>
       {error && <p className="alert alert-error" role="alert">{error}</p>}
       <input type="hidden" name="_name" value="saveProduct" />
@@ -91,7 +112,7 @@ export function ProductForm({ categories, initial }: { categories: Category[]; i
       <input type="hidden" name="imageUrl" value={imageUrl} />
       <div className="mb-4 flex items-center justify-between">
         <h3 className="slab text-[19px]">{isEdit ? "Edit Produk" : "Tambah Produk"}</h3>
-        <button className="x-btn" type="button" onClick={() => setOpen(false)} aria-label="Tutup">
+        <button className="x-btn" type="button" onClick={onClose} aria-label="Tutup">
           ✕
         </button>
       </div>
