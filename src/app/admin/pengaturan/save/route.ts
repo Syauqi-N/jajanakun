@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
+import { appBase, isSameOrigin } from "@/lib/request";
 import { SETTING_KEYS, normalizeWa, setSetting } from "@/lib/settings";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-/** Base URL publik untuk redirect (hindari host internal container). */
-function appBase(req: Request): string {
-  const env = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "");
-  if (env) return env;
-  return new URL(req.url).origin;
-}
 
 /**
  * Simpan pengaturan toko lewat form POST biasa (bukan server action),
@@ -18,6 +12,7 @@ function appBase(req: Request): string {
  */
 export async function POST(req: Request) {
   const base = appBase(req);
+  if (!isSameOrigin(req)) return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
   if (!(await isAdmin())) {
     return NextResponse.redirect(new URL("/admin/login", base), { status: 303 });
   }

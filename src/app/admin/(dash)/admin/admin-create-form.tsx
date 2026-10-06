@@ -51,7 +51,7 @@ export function AdminCreateForm() {
         </label>
         <label className="field" style={{ marginBottom: 0, flex: "1 1 200px" }}>
           <span>Password (kosong = dibuat otomatis)</span>
-          <input className="input" name="password" type="text" placeholder="min. 6 karakter" />
+          <input className="input" name="password" type="text" placeholder="min. 10 karakter (kosong = acak)" />
         </label>
         <button className="btn btn-green" type="submit" disabled={pending}>
           {pending ? "Menyimpan…" : "+ Tambah Admin"}

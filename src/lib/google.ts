@@ -68,10 +68,13 @@ export async function exchangeCodeForProfile(code: string): Promise<GoogleProfil
   const info = (await infoRes.json()) as {
     sub: string;
     email?: string;
+    email_verified?: boolean;
     name?: string;
     picture?: string;
   };
   if (!info.email) throw new Error("Akun Google tidak memiliki email.");
+  // Akun ditautkan berdasarkan email — hanya percayai email yang diverifikasi Google.
+  if (info.email_verified !== true) throw new Error("Email akun Google belum terverifikasi.");
 
   return {
     googleId: info.sub,

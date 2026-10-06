@@ -17,8 +17,10 @@ function periodStart(period: string): Date | null {
 }
 
 function esc(v: string | number) {
-  const s = String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  let s = String(v);
+  // Cegah formula injection saat dibuka di Excel/Sheets (=, +, -, @, tab, CR di awal sel).
+  if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 export async function GET(req: Request) {

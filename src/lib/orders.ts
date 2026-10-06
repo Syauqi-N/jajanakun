@@ -180,47 +180,31 @@ export async function claimOrder(code: string, userId: string) {
   });
 }
 
-/** Cari order PENDING berdasarkan nominal unik (matching webhook SoqiPG). */
-export async function findPendingOrderByAmount(amount: number) {
-  return prisma.order.findFirst({
-    where: { amount, status: "PENDING" },
-    orderBy: { createdAt: "desc" },
-  });
-}
-
 /** Handler webhook terpadu (callback SoqiPG). Return info agar route bisa balas status. */
 export async function handleWebhook(payload: WebhookPayload) {
   // Callback SoqiPG mengirim: { reference, status, amount, totalAmount, paidAt }
-  const amount = Number(payload.totalAmount ?? payload.amount ?? payload.grossAmount ?? 0);
-  const status = payload.status;
-
-  // Cari order: utamakan by kode (reference), fallback by nominal unik.
-  let order = null as Awaited<ReturnType<typeof findPendingOrderByAmount>>;
-  const orderCode = (payload.orderCode as string) || (payload.reference as string);
-  if (orderCode) {
-    order = await prisma.order.findUnique({ where: { code: orderCode.toUpperCase() } });
-  }
-  if (!order && amount > 0) {
-    order = await findPendingOrderByAmount(amount);
-  }
+  // Order dicocokkan HANYA lewat kode (reference) — nominal bisa kembar antar order.
+  const orderCode = String(payload.reference ?? payload.orderCode ?? "").trim().toUpperCase();
+  if (!orderCode) return { ok: false as const, reason: "missing_reference" };
+  const order = await prisma.order.findUnique({ where: { code: orderCode } });
   if (!order) return { ok: false as const, reason: "order_not_found" };
 
-  if (!isPaidStatus(status)) {
+  if (!isPaidStatus(payload.status)) {
     return { ok: true as const, order, action: "ignored_status" as const };
   }
 
-  // Validasi nominal (kalau ada) — cegah salah match.
-  if (amount > 0 && amount !== order.amount) {
-    return { ok: false as const, reason: "amount_mismatch" };
-  }
+  // Nominal wajib ada & sama persis dengan yang ditagihkan.
+  const amount = Number(payload.totalAmount ?? payload.amount ?? payload.grossAmount);
+  if (!Number.isFinite(amount) || amount <= 0) return { ok: false as const, reason: "missing_amount" };
+  if (amount !== order.amount) return { ok: false as const, reason: "amount_mismatch" };
 
+  const paidAt = payload.paidAt ? new Date(String(payload.paidAt)) : null;
   const result = await markOrderPaid(order, {
-    paidAt: payload.paidAt ? new Date(String(payload.paidAt)) : new Date(),
+    paidAt: paidAt && !Number.isNaN(paidAt.getTime()) ? paidAt : new Date(),
     source: "webhook.soqipg",
-    ref: (payload.reference as string) || undefined,
+    ref: orderCode,
     raw: JSON.stringify(payload),
   });
 
   return { ok: true as const, order, action: result.alreadyProcessed ? "duplicate" : "paid" };
 }
-

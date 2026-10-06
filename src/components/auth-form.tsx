@@ -121,7 +121,7 @@ export function AuthForm({ mode, googleEnabled = false }: { mode: "login" | "reg
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
+                placeholder="Minimal 8 karakter"
                 autoComplete={mode === "login" ? "current-password" : "new-password"}
                 required
               />

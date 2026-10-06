@@ -4,11 +4,13 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import sharp from "sharp";
 import { isAdmin } from "@/lib/auth";
+import { isSameOrigin } from "@/lib/request";
 
 export const runtime = "nodejs";
 const MAX_BYTES = 3 * 1024 * 1024;
 
 export async function POST(req: Request) {
+  if (!isSameOrigin(req)) return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
   if (!(await isAdmin())) return NextResponse.json({ error: "Tidak diizinkan." }, { status: 401 });
   if (Number(req.headers.get("content-length")) > MAX_BYTES + 65536) {
     return NextResponse.json({ error: "Ukuran gambar maksimal 3MB." }, { status: 413 });

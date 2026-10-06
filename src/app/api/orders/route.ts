@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { createOrder } from "@/lib/orders";
 import { getCurrentUser } from "@/lib/user-auth";
+import { rateLimit } from "@/lib/rate-limit";
+import { clip, isSameOrigin } from "@/lib/request";
 
 export async function POST(req: Request) {
+  if (!isSameOrigin(req)) return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
   try {
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Kamu harus masuk dulu sebelum membeli.", code: "UNAUTHORIZED" }, { status: 401 });
+    }
+    // Tiap pesanan membuat transaksi di gateway — batasi 10 pesanan / 10 menit per user.
+    if (!rateLimit(`order:${user.id}`, 10, 10 * 60_000)) {
+      return NextResponse.json({ error: "Terlalu banyak pesanan dalam waktu singkat. Coba lagi sebentar lagi." }, { status: 429 });
     }
 
     const body = await req.json();
@@ -26,9 +33,9 @@ export async function POST(req: Request) {
     const { order } = await createOrder({
       lines,
       userId: user.id,
-      buyerName: body.buyerName || user.name || undefined,
-      buyerWa: body.buyerWa || user.wa || undefined,
-      buyerNote: body.buyerNote,
+      buyerName: clip(body.buyerName, 100) || user.name || undefined,
+      buyerWa: clip(body.buyerWa, 30) || user.wa || undefined,
+      buyerNote: clip(body.buyerNote, 500),
     });
 
     return NextResponse.json({ code: order!.code, amount: order!.amount });

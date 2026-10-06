@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
+import { appBase, isSameOrigin, safeRedirectPath } from "@/lib/request";
 import {
   cancelOrder,
   deleteCategory,
@@ -19,13 +20,6 @@ import { deleteAdmin, saveAdmin, toggleAdmin } from "../actions/settings";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Base URL publik untuk redirect (hindari host internal container). */
-function appBase(req: Request): string {
-  const env = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "");
-  if (env) return env;
-  return new URL(req.url).origin;
-}
-
 /**
  * Titik masuk tunggal untuk aksi admin yang dipicu dari form.
  * Dipakai agar pemanggilan berjalan lewat POST biasa + redirect absolut,
@@ -35,13 +29,14 @@ function appBase(req: Request): string {
  */
 export async function POST(req: Request) {
   const base = appBase(req);
+  if (!isSameOrigin(req)) return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
   if (!(await isAdmin())) {
     return NextResponse.redirect(new URL("/admin/login", base), { status: 303 });
   }
 
   const fd = await req.formData();
   const name = String(fd.get("_name") || "");
-  const redirectTo = String(fd.get("_redirect") || "/admin");
+  const redirectTo = safeRedirectPath(fd.get("_redirect"), "/admin");
   const wantJson = String(fd.get("_json") || "") === "1";
 
   let error: string | null = null;

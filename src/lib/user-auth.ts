@@ -1,36 +1,19 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "./prisma";
+import { secureCookies, signingKey } from "./auth";
+import { hashPassword, verifyPassword } from "./password";
+import { clip } from "./request";
+
+export { hashPassword, verifyPassword };
 
 const COOKIE = "gk_user";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 hari
 
-function secret(): string {
-  return process.env.ADMIN_SESSION_SECRET || "dev-secret-change-me";
-}
-
-/* ---------------- password hashing (scrypt, tanpa dependency tambahan) ---------------- */
-
-export function hashPassword(password: string): string {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
-  return `scrypt$${salt}$${hash}`;
-}
-
-export function verifyPassword(password: string, stored: string | null): boolean {
-  if (!stored) return false;
-  const [algo, salt, hash] = stored.split("$");
-  if (algo !== "scrypt" || !salt || !hash) return false;
-  const test = crypto.scryptSync(password, salt, 64);
-  const expected = Buffer.from(hash, "hex");
-  if (test.length !== expected.length) return false;
-  return crypto.timingSafeEqual(test, expected);
-}
-
 /* ---------------- session token (signed) ---------------- */
 
 function sign(value: string): string {
-  return crypto.createHmac("sha256", secret()).update(value).digest("hex");
+  return crypto.createHmac("sha256", signingKey("user")).update(value).digest("hex");
 }
 
 function makeToken(userId: string): string {
@@ -49,8 +32,6 @@ function readToken(token: string | undefined): string | null {
   if (Number(exp) <= Date.now()) return null;
   return userId;
 }
-
-import { secureCookies } from "./auth";
 
 export async function createUserSession(userId: string): Promise<void> {
   const store = await cookies();
@@ -80,13 +61,14 @@ export async function getCurrentUser() {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function isValidEmail(email: string): boolean {
-  return EMAIL_RE.test(email);
+  return email.length <= 254 && EMAIL_RE.test(email);
 }
 
 export async function registerUser(params: { email: string; password: string; name?: string; wa?: string }) {
   const email = params.email.trim().toLowerCase();
   if (!isValidEmail(email)) throw new Error("Format email tidak valid.");
-  if (params.password.length < 6) throw new Error("Password minimal 6 karakter.");
+  if (params.password.length < 8) throw new Error("Password minimal 8 karakter.");
+  if (params.password.length > 200) throw new Error("Password terlalu panjang.");
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) throw new Error("Email sudah terdaftar. Silakan masuk.");
@@ -94,8 +76,8 @@ export async function registerUser(params: { email: string; password: string; na
   const user = await prisma.user.create({
     data: {
       email,
-      name: params.name?.trim() || null,
-      wa: params.wa?.trim() || null,
+      name: clip(params.name, 100) || null,
+      wa: clip(params.wa, 30) || null,
       passwordHash: hashPassword(params.password),
     },
   });
@@ -112,16 +94,29 @@ export async function loginUser(email: string, password: string) {
   return user;
 }
 
-/** Buat/perbarui user dari profil Google. */
+/**
+ * Buat/perbarui user dari profil Google. Pemanggil wajib memastikan email
+ * sudah terverifikasi oleh Google sebelum akun ditautkan berdasarkan email.
+ */
 export async function upsertGoogleUser(profile: {
   googleId: string;
   email: string;
   name?: string;
   avatarUrl?: string;
 }) {
+  const byGoogle = await prisma.user.findUnique({ where: { googleId: profile.googleId } });
+  if (byGoogle) {
+    await createUserSession(byGoogle.id);
+    return byGoogle;
+  }
+
   const email = profile.email.toLowerCase();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
+    // Jangan timpa tautan Google lain yang sudah terpasang di akun ini.
+    if (existing.googleId && existing.googleId !== profile.googleId) {
+      throw new Error("Email ini sudah tertaut ke akun Google lain.");
+    }
     const user = await prisma.user.update({
       where: { id: existing.id },
       data: {

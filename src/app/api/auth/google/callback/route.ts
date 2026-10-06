@@ -2,17 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { exchangeCodeForProfile } from "@/lib/google";
 import { upsertGoogleUser } from "@/lib/user-auth";
-
-/**
- * Base URL publik untuk redirect.
- * Di balik Cloudflare Tunnel, `req.url` berisi host internal container
- * (mis. 0.0.0.0:3000) sehingga redirect bisa salah. Utamakan APP_URL.
- */
-function appBase(req: Request): string {
-  const env = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "");
-  if (env) return env;
-  return new URL(req.url).origin;
-}
+import { appBase } from "@/lib/request";
 
 export async function GET(req: Request) {
   const base = appBase(req);

@@ -3,9 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Standalone → image Docker kecil (hanya file yang dibutuhkan runtime).
   output: "standalone",
-  images: {
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
-  },
+  // Tidak ada next/image remote: jangan buka /_next/image sebagai proxy untuk host mana pun.
   experimental: {
     serverActions: {
       bodySizeLimit: "4mb",

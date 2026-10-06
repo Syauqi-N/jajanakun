@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { prisma } from "./prisma";
 
 /**
@@ -77,43 +76,4 @@ export function normalizeWa(input: string): string {
   else if (d.startsWith("620")) d = "62" + d.slice(3);
   else if (!d.startsWith("62")) d = "62" + d;
   return d;
-}
-
-// ---------- Password admin ----------
-
-/** Hash password admin dengan scrypt (tanpa dependensi tambahan). */
-export function hashPassword(password: string): string {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const derived = crypto.scryptSync(password, salt, 32).toString("hex");
-  return `scrypt:${salt}:${derived}`;
-}
-
-/** Verifikasi password terhadap hash "scrypt:<salt>:<hash>" (constant-time). */
-export function verifyPassword(password: string, hash: string): boolean {
-  if (!password || !hash) return false;
-  const parts = hash.split(":");
-  if (parts.length !== 3 || parts[0] !== "scrypt") return false;
-  const [, salt, expected] = parts;
-  let derived: Buffer;
-  try {
-    derived = crypto.scryptSync(password, salt, 32);
-  } catch {
-    return false;
-  }
-  const exp = Buffer.from(expected, "hex");
-  if (exp.length !== derived.length) return false;
-  try {
-    return crypto.timingSafeEqual(exp, derived);
-  } catch {
-    return false;
-  }
-}
-
-/** Acak password admin baru (dibagikan manual ke pemilik akun). */
-export function randomPassword(length = 10): string {
-  const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789";
-  let out = "";
-  const bytes = crypto.randomBytes(length);
-  for (let i = 0; i < length; i++) out += chars[bytes[i] % chars.length];
-  return out;
 }

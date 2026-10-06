@@ -1,7 +1,8 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "./prisma";
-import { hashPassword, verifyPassword } from "./settings";
+import { envAdminEmail, envAdminPassword, sessionSecret } from "./env";
+import { hashPassword, safeEqual, verifyPassword } from "./password";
 
 const COOKIE = "gk_admin";
 const MAX_AGE = 60 * 60 * 12; // 12 jam
@@ -12,71 +13,67 @@ export function secureCookies(): boolean {
   return url.startsWith("https://");
 }
 
-function secret(): string {
-  return process.env.ADMIN_SESSION_SECRET || "dev-secret-change-me";
+/** Kunci HMAC per tujuan (admin vs user) diturunkan dari satu secret. */
+export function signingKey(purpose: "admin" | "user"): Buffer {
+  return crypto.createHmac("sha256", sessionSecret()).update(`gk-session:${purpose}`).digest();
 }
 
 function sign(value: string): string {
-  return crypto.createHmac("sha256", secret()).update(value).digest("hex");
+  return crypto.createHmac("sha256", signingKey("admin")).update(value).digest("hex");
 }
 
 /** Identitas admin dalam token: email + role (super|admin). */
 type AdminToken = { email: string; role: "super" | "admin" };
 
-function makeToken(id: AdminToken): string {
-  const payload = `${Buffer.from(JSON.stringify(id)).toString("base64url")}.${Date.now() + MAX_AGE * 1000}`;
+/** Sidik jari hash password — sesi lama gugur otomatis saat password diganti. */
+function passwordVersion(passwordHash: string): string {
+  return crypto.createHash("sha256").update(passwordHash).digest("hex").slice(0, 16);
+}
+
+function makeToken(email: string, pv: string): string {
+  const encoded = Buffer.from(JSON.stringify({ email, pv })).toString("base64url");
+  const payload = `${encoded}.${Date.now() + MAX_AGE * 1000}`;
   return `admin.${payload}.${sign(payload)}`;
 }
 
-function readToken(token: string | undefined): AdminToken | null {
+function readToken(token: string | undefined): { email: string; pv: string } | null {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 4) return null;
-  const [role, encoded, exp, sig] = parts;
+  const [kind, encoded, exp, sig] = parts;
   const payload = `${encoded}.${exp}`;
   const expected = sign(payload);
   if (sig.length !== expected.length) return null;
   if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
-  if (role !== "admin" || Number(exp) <= Date.now()) return null;
+  if (kind !== "admin" || Number(exp) <= Date.now()) return null;
   try {
-    const id = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")) as AdminToken;
-    if (!id?.email) return null;
-    return id;
+    const id = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")) as { email?: string; pv?: string };
+    if (!id?.email || !id.pv) return null;
+    return { email: id.email, pv: id.pv };
   } catch {
     return null;
   }
 }
 
-/** Kredensial super admin dari env (selalu bisa login). */
-function envAdmin(): { email: string; password: string } {
-  return {
-    email: (process.env.ADMIN_EMAIL || process.env.ADMIN_USER || "admin@jajanakun.store").trim().toLowerCase(),
-    password: process.env.ADMIN_PASSWORD || "admin123",
-  };
-}
-
 /**
  * Cek kredensial login admin.
- *  - Super admin: cocokkan dengan env ADMIN_EMAIL/ADMIN_PASSWORD.
+ *  - Super admin: cocokkan dengan env ADMIN_EMAIL/ADMIN_PASSWORD (baris DB disinkronkan).
  *  - Admin biasa: cek tabel `admins` (password di-hash scrypt).
- * Mengembalikan identitas admin bila valid, atau null.
+ * Mengembalikan baris admin bila valid, atau null.
  */
-export async function checkCredentialsAsync(email: string, pass: string): Promise<AdminToken | null> {
+export async function checkCredentialsAsync(email: string, pass: string) {
   const em = email.trim().toLowerCase();
-  const env = envAdmin();
-  if (em === env.email && pass === env.password) {
-    return { email: env.email, role: "super" };
+  if (em === envAdminEmail() && safeEqual(pass, envAdminPassword())) {
+    return ensureSuperAdmin();
   }
   const row = await prisma.admin.findUnique({ where: { email: em } });
-  if (row && row.active && verifyPassword(pass, row.passwordHash)) {
-    return { email: row.email, role: row.isSuper ? "super" : "admin" };
-  }
+  if (row && row.active && verifyPassword(pass, row.passwordHash)) return row;
   return null;
 }
 
-export async function createSession(id: AdminToken): Promise<void> {
+export async function createSession(admin: { email: string; passwordHash: string }): Promise<void> {
   const store = await cookies();
-  store.set(COOKIE, makeToken(id), {
+  store.set(COOKIE, makeToken(admin.email, passwordVersion(admin.passwordHash)), {
     httpOnly: true,
     sameSite: "lax",
     secure: secureCookies(),
@@ -90,39 +87,45 @@ export async function destroySession(): Promise<void> {
   store.delete(COOKIE);
 }
 
-export async function isAdmin(): Promise<boolean> {
-  const store = await cookies();
-  return readToken(store.get(COOKIE)?.value) !== null;
-}
-
-/** Identitas admin yang sedang login (email + role), atau null. */
+/**
+ * Identitas admin yang sedang login, atau null. Selalu dicek ulang ke DB:
+ * admin yang dinonaktifkan, dihapus, atau diganti passwordnya langsung keluar.
+ */
 export async function currentAdmin(): Promise<AdminToken | null> {
   const store = await cookies();
-  return readToken(store.get(COOKIE)?.value);
+  const token = readToken(store.get(COOKIE)?.value);
+  if (!token) return null;
+  const row = await prisma.admin.findUnique({ where: { email: token.email } });
+  if (!row || !row.active || passwordVersion(row.passwordHash) !== token.pv) return null;
+  return { email: row.email, role: row.isSuper ? "super" : "admin" };
 }
 
-/** true bila admin yang login adalah super admin (dari env). */
+export async function isAdmin(): Promise<boolean> {
+  return (await currentAdmin()) !== null;
+}
+
+/** true bila admin yang login adalah super admin. */
 export async function isSuperAdmin(): Promise<boolean> {
   return (await currentAdmin())?.role === "super";
 }
 
-/** Pastikan super admin ada di tabel `admins` (seed dari env, sekali). */
-export async function ensureSuperAdmin(): Promise<void> {
-  const env = envAdmin();
-  const existing = await prisma.admin.findUnique({ where: { email: env.email } });
-  if (existing) {
-    if (!existing.isSuper) {
-      await prisma.admin.update({ where: { email: env.email }, data: { isSuper: true, active: true } });
-    }
-    return;
+/**
+ * Pastikan super admin (dari env) ada di tabel `admins`, aktif, dan hash
+ * passwordnya cocok dengan env (ganti ADMIN_PASSWORD = sesi lama gugur).
+ */
+export async function ensureSuperAdmin() {
+  const email = envAdminEmail();
+  const password = envAdminPassword();
+  const existing = await prisma.admin.findUnique({ where: { email } });
+  if (!existing) {
+    return prisma.admin.create({
+      data: { email, name: "Admin Utama", passwordHash: hashPassword(password), isSuper: true, active: true },
+    });
   }
-  await prisma.admin.create({
-    data: {
-      email: env.email,
-      name: "Admin Utama",
-      passwordHash: hashPassword(env.password),
-      isSuper: true,
-      active: true,
-    },
+  const passwordOk = verifyPassword(password, existing.passwordHash);
+  if (existing.isSuper && existing.active && passwordOk) return existing;
+  return prisma.admin.update({
+    where: { email },
+    data: { isSuper: true, active: true, ...(passwordOk ? {} : { passwordHash: hashPassword(password) }) },
   });
 }

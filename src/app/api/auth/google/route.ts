@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { buildAuthUrl, googleConfigured, randomState } from "@/lib/google";
 import { cookies } from "next/headers";
+import { secureCookies } from "@/lib/auth";
+import { appBase } from "@/lib/request";
 
 export async function GET(req: Request) {
-  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || new URL(req.url).origin;
+  const base = appBase(req);
   if (!googleConfigured()) {
     return NextResponse.redirect(new URL("/masuk?error=google_belum_dikonfigurasi", base));
   }
@@ -12,7 +14,7 @@ export async function GET(req: Request) {
   store.set("gk_oauth_state", state, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
     path: "/",
     maxAge: 600,
   });

@@ -8,13 +8,21 @@ import { handleWebhook } from "@/lib/orders";
  * Keamanan:
  *  - Verifikasi signature HMAC (header x-soqipg-signature).
  *  - Idempotent: PaymentEvent.ref unik mencegah double proses.
- *  - Matching order: kode pesanan ATAU nominal unik (amount).
+ *  - Matching order: hanya kode pesanan (reference) + nominal wajib sama.
  */
 export async function POST(req: Request) {
   const raw = await req.text();
   const signature = req.headers.get("x-soqipg-signature") || req.headers.get("x-callback-signature");
 
-  if (!verifyWebhookSignature(raw, signature)) {
+  let valid: boolean;
+  try {
+    valid = verifyWebhookSignature(raw, signature);
+  } catch (err) {
+    // Secret belum dikonfigurasi di produksi — tolak, jangan pernah fail-open.
+    console.error("[webhook/soqipg]", err);
+    return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
+  }
+  if (!valid) {
     return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 401 });
   }
 

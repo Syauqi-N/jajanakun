@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { webhookSecret } from "./env";
 
 /**
  * Adapter SoqiPG (repo `pg-gopay`) untuk jajanakun.store.
@@ -100,14 +101,15 @@ export async function createCharge(input: CreateChargeInput): Promise<ChargeResu
 /**
  * Verifikasi callback SoqiPG: HMAC-SHA256(rawBody, callbackSecret) == header.
  * Header: x-soqipg-signature (lihat `pg-gopay/src/lib/hmac.ts`).
- * Bila SOQIPG_WEBHOOK_SECRET kosong -> lolos (khusus dev).
+ * Bila SOQIPG_WEBHOOK_SECRET kosong -> lolos HANYA di dev; di produksi error.
  */
 export function verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
-  const secret = process.env.SOQIPG_WEBHOOK_SECRET;
+  const secret = webhookSecret();
   if (!secret) return true;
   if (!signature) return false;
   const expected = crypto.createHmac("sha256", secret).update(rawBody, "utf8").digest("hex");
   const a = Buffer.from(expected, "hex");
+  if (!/^[0-9a-f]{64}$/i.test(signature)) return false;
   const b = Buffer.from(signature, "hex");
   if (a.length !== b.length || a.length === 0) return false;
   return crypto.timingSafeEqual(a, b);

@@ -11,7 +11,6 @@ const CONTENT_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".gif": "image/gif",
-  ".svg": "image/svg+xml",
 };
 
 /**
@@ -42,6 +41,7 @@ export async function GET(
         "Content-Type": type,
         "Content-Length": String(info.size),
         "Cache-Control": "public, max-age=31536000, immutable",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch {

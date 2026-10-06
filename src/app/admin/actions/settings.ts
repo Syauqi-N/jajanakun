@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { currentAdmin, isAdmin, isSuperAdmin } from "@/lib/auth";
-import { SETTING_KEYS, hashPassword, normalizeWa, randomPassword, setSetting } from "@/lib/settings";
+import { SETTING_KEYS, normalizeWa, setSetting } from "@/lib/settings";
+import { hashPassword, randomPassword } from "@/lib/password";
 
 async function guard() {
   if (!(await isAdmin())) throw new Error("Tidak diizinkan.");
@@ -31,7 +32,7 @@ export async function saveAdmin(formData: FormData): Promise<{ error?: string; o
     // Ubah nama / status / (opsional) password.
     const data: { name: string; passwordHash?: string } = { name };
     if (passwordInput) {
-      if (passwordInput.length < 6) return { error: "Password minimal 6 karakter." };
+      if (passwordInput.length < 10) return { error: "Password admin minimal 10 karakter." };
       data.passwordHash = hashPassword(passwordInput);
     }
     await prisma.admin.update({ where: { id }, data });
@@ -43,7 +44,8 @@ export async function saveAdmin(formData: FormData): Promise<{ error?: string; o
   const existing = await prisma.admin.findUnique({ where: { email } });
   if (existing) return { error: "Email sudah terdaftar." };
 
-  const plain = passwordInput.length >= 6 ? passwordInput : randomPassword(10);
+  if (passwordInput && passwordInput.length < 10) return { error: "Password admin minimal 10 karakter." };
+  const plain = passwordInput || randomPassword(14);
   await prisma.admin.create({
     data: { email, name, passwordHash: hashPassword(plain), active: true, isSuper: false },
   });

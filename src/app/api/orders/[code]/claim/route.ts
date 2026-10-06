@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { claimOrder } from "@/lib/orders";
 import { getCurrentUser } from "@/lib/user-auth";
 import { prisma } from "@/lib/prisma";
+import { isSameOrigin } from "@/lib/request";
 
-export async function POST(_req: Request, { params }: { params: Promise<{ code: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ code: string }> }) {
+  if (!isSameOrigin(req)) return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Silakan masuk terlebih dahulu." }, { status: 401 });
   const { code } = await params;
