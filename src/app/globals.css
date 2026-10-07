@@ -469,6 +469,13 @@ h3 {
   font-size: 13.5px;
   color: var(--ink-soft);
   margin: 0;
+  /* Kartu katalog hanya cuplikan 3 baris; deskripsi lengkap di halaman produk. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .price-row {
   display: flex;
