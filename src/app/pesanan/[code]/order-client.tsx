@@ -28,8 +28,23 @@ type OrderData = {
     poEta: string;
     poEndsAt: string | null;
     poMinQty: number;
+    adminWa: string | null; // null = nomor toko
   }[];
 };
+
+type OrderItem = OrderData["items"][number];
+
+/** Kelompokkan item per nomor admin (produk bisa punya admin WA sendiri). */
+function groupByAdmin(items: OrderItem[], storeWa: string): { wa: string; items: OrderItem[] }[] {
+  const groups: { wa: string; items: OrderItem[] }[] = [];
+  for (const it of items) {
+    const wa = it.adminWa || storeWa;
+    const g = groups.find((x) => x.wa === wa);
+    if (g) g.items.push(it);
+    else groups.push({ wa, items: [it] });
+  }
+  return groups;
+}
 
 function useCountdown(expiresAt: string | undefined, active: boolean) {
   const [left, setLeft] = useState(0);
@@ -164,18 +179,20 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
     }
   };
 
-  const buildWaMessage = (o: OrderData) => {
+  /** Pesan klaim untuk satu admin. `items` = produk yang ditangani admin tsb. */
+  const buildWaMessage = (o: OrderData, items: OrderItem[] = o.items) => {
+    const partial = items.length !== o.items.length;
     const lines = [
       `Halo admin jajanakun.store, saya mau klaim akun pesanan saya:`,
       ``,
       `Kode pesanan: ${o.code}`,
       `Nama: ${o.buyerName || "Pelanggan"}`,
-      `Subtotal: ${rp(o.subtotal)}`,
-      `Kode unik: ${o.uniqueCode}`,
-      `Total bayar: ${rp(o.amount)}`,
+      ...(partial
+        ? [`Subtotal produk ini: ${rp(items.reduce((sum, it) => sum + it.price * it.qty, 0))}`, `Total bayar (seluruh pesanan): ${rp(o.amount)}`]
+        : [`Subtotal: ${rp(o.subtotal)}`, `Kode unik: ${o.uniqueCode}`, `Total bayar: ${rp(o.amount)}`]),
       ``,
       `Produk:`,
-      ...o.items.map((it) => `- ${it.name} × ${it.qty} @ ${rp(it.price)} = ${rp(it.price * it.qty)}${it.isPreOrder ? ` (PRE-ORDER, estimasi ${it.poEta || "1-3 hari"})` : ""}`),
+      ...items.map((it) => `- ${it.name} × ${it.qty} @ ${rp(it.price)} = ${rp(it.price * it.qty)}${it.isPreOrder ? ` (PRE-ORDER, estimasi ${it.poEta || "1-3 hari"})` : ""}`),
       ``,
       `Mohon diproses ya. Terima kasih!`,
     ];
@@ -190,8 +207,12 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
       const res = await fetch(`/api/orders/${code}/claim`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mencatat klaim.");
-      // Navigasi tab yang sama tidak diblokir popup blocker. Pesan belum dikirim sampai pembeli menekan Kirim di WhatsApp.
-      window.location.assign(adminWaLink(buildWaMessage(order), adminWa));
+      const groups = groupByAdmin(order.items, adminWa);
+      if (groups.length === 1) {
+        // Navigasi tab yang sama tidak diblokir popup blocker. Pesan belum dikirim sampai pembeli menekan Kirim di WhatsApp.
+        window.location.assign(adminWaLink(buildWaMessage(order), groups[0].wa));
+      }
+      // Beberapa admin: muat ulang, lalu tampil satu tombol WhatsApp per admin.
       await load();
     } catch (err) {
       setClaimError(err instanceof Error ? err.message : "Koneksi bermasalah. Silakan coba lagi.");
@@ -225,6 +246,8 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
   const paid = order.status === "PAID" || order.status === "CLAIMED" || order.status === "DELIVERED";
   const claimed = order.status === "CLAIMED";
   const delivered = order.status === "DELIVERED";
+  const adminGroups = groupByAdmin(order.items, adminWa);
+  const multiAdmin = adminGroups.length > 1;
   const statusLabel: Record<string, string> = {
     PENDING: "Menunggu Pembayaran",
     PAID: "Lunas — Siap Diklaim",
@@ -400,18 +423,30 @@ export default function OrderPage({ code, adminWa }: { code: string; adminWa: st
               <div className="alert alert-info" style={{ marginBottom: 0 }}>
                 <strong>{delivered ? "Akun sudah dikirim" : claimed ? "Klaim tercatat — lanjutkan di WhatsApp" : "Pembayaran lunas — klaim akunmu"}</strong>
                 {delivered ? "Admin sudah menandai akun terkirim. Silakan periksa percakapan WhatsApp kamu." :
-                  claimed ? "Pastikan pesan klaim sudah kamu kirim di WhatsApp. Tombol di bawah dapat dibuka kembali kapan saja." :
+                  claimed ? (multiAdmin
+                    ? "Pesananmu ditangani beberapa admin. Kirim pesan klaim ke setiap admin lewat tombol di bawah."
+                    : "Pastikan pesan klaim sudah kamu kirim di WhatsApp. Tombol di bawah dapat dibuka kembali kapan saja.") :
                   "Klik tombol di bawah. Pesan sudah berisi kode pesanan, produk, jumlah, dan total — tinggal kirim di WhatsApp."}
                 {claimError && <p className="alert alert-error mt-3" role="alert">{claimError}</p>}
-                <div style={{ marginTop: 12 }}>
+                <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 10 }}>
                   {!claimed && !delivered ? (
                     <button className="btn btn-mustard" type="button" onClick={claim} disabled={claiming}>
-                      {claiming ? "Memproses…" : "Klaim Akun via WhatsApp →"}
+                      {claiming ? "Memproses…" : multiAdmin ? "Klaim Akun →" : "Klaim Akun via WhatsApp →"}
                     </button>
                   ) : (
-                    <a className="btn btn-mustard" href={adminWaLink(buildWaMessage(order), adminWa)} target="_blank" rel="noreferrer">
-                      {delivered ? "Hubungi Admin" : "Buka WhatsApp Lagi →"}
-                    </a>
+                    adminGroups.map((g) => (
+                      <a
+                        key={g.wa}
+                        className="btn btn-mustard"
+                        href={adminWaLink(buildWaMessage(order, multiAdmin ? g.items : order.items), g.wa)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {multiAdmin
+                          ? `WhatsApp Admin: ${g.items.map((it) => it.name).join(", ")} →`
+                          : delivered ? "Hubungi Admin" : "Buka WhatsApp Lagi →"}
+                      </a>
+                    ))
                   )}
                 </div>
               </div>

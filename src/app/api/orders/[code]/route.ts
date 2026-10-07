@@ -34,6 +34,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ code: s
       poEta: i.poEta,
       poEndsAt: i.poEndsAt,
       poMinQty: i.poMinQty,
+      adminWa: i.product.adminWa || null, // null = nomor toko
     })),
   });
 }

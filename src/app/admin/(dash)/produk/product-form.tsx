@@ -24,6 +24,7 @@ export type ProductFormValues = {
   poEta?: string;
   poMinQty?: number;
   poEndsAt?: string | null;
+  adminWa?: string;
 };
 
 type FormProps = { categories: Category[]; initial?: ProductFormValues };
@@ -186,6 +187,17 @@ function ProductFormBody({ categories, initial, onClose }: FormProps & { onClose
         <label className="field">
           <span>Garansi</span>
           <input className="input" name="warranty" defaultValue={initial?.warranty} placeholder="Garansi 30 Hari" />
+        </label>
+        <label className="field">
+          <span>Nomor WA Admin (opsional)</span>
+          <input
+            className="input"
+            name="adminWa"
+            type="tel"
+            inputMode="numeric"
+            defaultValue={initial?.adminWa}
+            placeholder="08… — kosong = nomor toko"
+          />
         </label>
         <label className="field">
           <span>Badge (opsional)</span>

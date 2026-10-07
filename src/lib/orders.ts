@@ -128,7 +128,7 @@ export async function getOrderByCode(code: string) {
     include: {
       items: {
         include: {
-          product: { select: { slug: true, tileBg: true, tileFg: true, letter: true } },
+          product: { select: { slug: true, tileBg: true, tileFg: true, letter: true, adminWa: true } },
         },
       },
     },

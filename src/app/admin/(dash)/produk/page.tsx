@@ -56,6 +56,11 @@ export default async function AdminProdukPage() {
                   <div className="mono" style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>
                     {p.duration}
                   </div>
+                  {p.adminWa && (
+                    <div className="mono" style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>
+                      Admin WA: +{p.adminWa}
+                    </div>
+                  )}
                 </td>
                 <td>{p.category.name}</td>
                 <td className="mono" style={{ whiteSpace: "nowrap" }}>
@@ -106,6 +111,7 @@ export default async function AdminProdukPage() {
                             poEta: p.poEta,
                             poMinQty: p.poMinQty,
                             poEndsAt: p.poEndsAt?.toISOString() ?? null,
+                            adminWa: p.adminWa,
                           }}
                         />
                       </div>

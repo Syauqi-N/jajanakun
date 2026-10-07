@@ -46,6 +46,8 @@ model Product {
   poEta       String   @default("") // estimasi masa PO, mis. "1-3 hari kerja"
   poEndsAt    DateTime? // batas batch PO; admin mengatur batch berikutnya
   poMinQty    Int      @default(0) // minimal pembelian agar PO jalan (0 = tanpa minimum)
+  // Nomor WhatsApp admin khusus produk ini (628…). Kosong = pakai nomor toko (Pengaturan).
+  adminWa     String   @default("")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

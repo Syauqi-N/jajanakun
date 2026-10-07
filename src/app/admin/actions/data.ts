@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/auth";
 import { slugify, generateClaimCode } from "@/lib/utils";
 import { markOrderPaid } from "@/lib/orders";
 import { preOrderReadiness } from "@/lib/preorder";
+import { normalizeWa } from "@/lib/settings";
 
 async function guard() {
   if (!(await isAdmin())) throw new Error("Tidak diizinkan.");
@@ -38,6 +39,8 @@ export async function saveProduct(formData: FormData) {
     poMinQty: Number(formData.get("poMinQty") || 0),
     poEndsAt: formData.get("isPreOrder") === "on" && formData.get("poEndsAt")
       ? new Date(`${formData.get("poEndsAt")}:00+07:00`) : null,
+    // Kosong = pakai nomor WA toko dari Pengaturan.
+    adminWa: normalizeWa(String(formData.get("adminWa") || "")),
   };
   if (!data.name || !data.categoryId) throw new Error("Nama & kategori wajib diisi.");
 
@@ -45,6 +48,7 @@ export async function saveProduct(formData: FormData) {
   if (!Number.isInteger(data.poMinQty) || data.poMinQty < 0) throw new Error("Minimum PO tidak valid.");
   if (data.isPreOrder && (!data.poEndsAt || Number.isNaN(data.poEndsAt.getTime()))) throw new Error("Isi batas waktu batch PO (WIB).");
   if (data.imageUrl && !/^\/uploads\/produk-[a-f0-9-]+\.webp$/.test(data.imageUrl)) throw new Error("Unggah gambar melalui form produk.");
+  if (data.adminWa && (data.adminWa.length < 10 || data.adminWa.length > 15)) throw new Error("Nomor WA admin tidak valid.");
 
   if (id) {
     await prisma.product.update({ where: { id }, data });

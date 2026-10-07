@@ -13,12 +13,13 @@ import { getSetting, SETTING_KEYS } from "@/lib/settings";
 export const dynamic = "force-dynamic";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const adminWa = await getSetting(SETTING_KEYS.adminWa);
   const { slug } = await params;
   const data = await getProductBySlug(slug);
   if (!data) notFound();
 
   const { dto } = data;
+  // Admin khusus produk bila diisi; selain itu nomor toko.
+  const adminWa = data.product.adminWa || (await getSetting(SETTING_KEYS.adminWa));
   const all = await getCatalogProducts();
   const others = all.filter((p) => p.id !== dto.id).slice(0, 4);
 
