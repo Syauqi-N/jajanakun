@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { adminWaLink } from "@/lib/utils";
-import { getSetting, SETTING_KEYS } from "@/lib/settings";
+import { getSetting, getStoreHours, SETTING_KEYS } from "@/lib/settings";
+import { formatHours } from "@/lib/store-hours";
 
 export async function SiteFooter() {
-  const adminWa = await getSetting(SETTING_KEYS.adminWa);
+  const [adminWa, hours] = await Promise.all([getSetting(SETTING_KEYS.adminWa), getStoreHours()]);
   return (
     <footer className="site-footer">
       <div className="wrap">
@@ -33,7 +34,7 @@ export async function SiteFooter() {
       <div className="foot-bar">
         <div className="wrap">
           <span>© {new Date().getFullYear()} JAJANAKUN.STORE — SURABAYA, JAWA TIMUR</span>
-          <span>BUKA 08.00–22.00 WIB • BAYAR QRIS • GARANSI SUNGGUHAN</span>
+          <span>BUKA {formatHours(hours).toUpperCase()} • BAYAR QRIS • GARANSI SUNGGUHAN</span>
         </div>
       </div>
     </footer>

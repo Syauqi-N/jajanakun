@@ -2,18 +2,29 @@
 
 import Link from "next/link";
 import { useStore } from "./store-provider";
+import { useStoreHours } from "./store-hours";
+import { fmtTime, formatHours } from "@/lib/store-hours";
 
 export type HeaderUser = { name: string | null; email: string } | null;
 
 export function SiteHeader({ user }: { user: HeaderUser }) {
   const { count, openDrawer, ready } = useStore();
+  const { hours, open } = useStoreHours();
   return (
     <>
       <div className="topstrip">
         <div className="wrap">
           <span>TOKO AKUN PREMIUM — SURABAYA &amp; SEKITARNYA</span>
           <span>
-            BUKA SETIAP HARI <b>08.00–22.00 WIB</b> • ADMIN FAST RESPON
+            {open === false ? (
+              <>
+                <b>TOKO TUTUP</b> • BUKA LAGI <b>{fmtTime(hours.open)} WIB</b>
+              </>
+            ) : (
+              <>
+                BUKA SETIAP HARI <b>{formatHours(hours).toUpperCase()}</b> • ADMIN FAST RESPON
+              </>
+            )}
           </span>
         </div>
       </div>
@@ -30,9 +41,9 @@ export function SiteHeader({ user }: { user: HeaderUser }) {
           </nav>
           <div className="header-actions">
             <div className="jam-buka">
-              Jam buka
+              {open === false ? <span className="tutup">Toko tutup</span> : "Jam buka"}
               <br />
-              <b>08.00 – 22.00 WIB</b>
+              <b>{formatHours(hours, " – ")}</b>
             </div>
             {user ? (
               <Link className="btn btn-sm" href="/akun" title={user.email}>

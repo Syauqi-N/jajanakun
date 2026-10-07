@@ -6,12 +6,14 @@ import { Toast } from "@/components/toast";
 import { Catalog, FeaturedTabs, Marquee } from "@/components/catalog";
 import { getCatalogProducts } from "@/lib/products";
 import { adminWaLink } from "@/lib/utils";
-import { getSetting, SETTING_KEYS, parseMarquee } from "@/lib/settings";
+import { getSetting, getStoreHours, SETTING_KEYS, parseMarquee } from "@/lib/settings";
+import { formatHours } from "@/lib/store-hours";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const adminWa = await getSetting(SETTING_KEYS.adminWa);
+  const jamBuka = formatHours(await getStoreHours());
   const marqueeItems = parseMarquee(await getSetting(SETTING_KEYS.marqueeItems));
   const products = await getCatalogProducts();
 
@@ -215,7 +217,7 @@ export default async function HomePage() {
                 <summary>Akun dikirim kapan setelah bayar?</summary>
                 <p>
                   Untuk produk ready, setelah pembayaran lunas kamu tekan tombol <b>Klaim Akun</b> di halaman pesanan —
-                  admin langsung mengirim akunmu lewat WhatsApp, biasanya dalam beberapa menit (jam 08.00–22.00 WIB).
+                  admin langsung mengirim akunmu lewat WhatsApp, biasanya dalam beberapa menit (jam {jamBuka}).
                   Untuk produk pre-order, akun dikirim setelah masa PO selesai (1–3 hari kerja).
                 </p>
               </details>
@@ -230,7 +232,7 @@ export default async function HomePage() {
               <div>
                 <h3 className="slab text-[20px]">Masih bingung?</h3>
                 <p style={{ color: "var(--ink-soft)", margin: "4px 0 0", fontSize: 14.5 }}>
-                  Chat admin langsung — tanya apa saja dijawab, jam 08.00–22.00 WIB.
+                  Chat admin langsung — tanya apa saja dijawab, jam {jamBuka}.
                 </p>
               </div>
               <a

@@ -17,17 +17,16 @@ export function SettingsForm({ children }: { children: React.ReactNode }) {
     e.preventDefault();
     setSending(true);
     setMsg(null);
-    const form = e.currentTarget;
+    const fd = new FormData(e.currentTarget);
+    fd.set("_json", "1");
     try {
-      const res = await fetch("/admin/pengaturan/save", {
-        method: "POST",
-        body: new FormData(form),
-      });
-      if (res.ok) {
+      const res = await fetch("/admin/pengaturan/save", { method: "POST", body: fd });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.ok) {
         setMsg({ ok: true, text: "Pengaturan tersimpan." });
         router.refresh();
       } else {
-        setMsg({ ok: false, text: "Gagal menyimpan. Coba lagi." });
+        setMsg({ ok: false, text: data?.error || "Gagal menyimpan. Coba lagi." });
       }
     } catch {
       setMsg({ ok: false, text: "Koneksi bermasalah. Coba lagi." });

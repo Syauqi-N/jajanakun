@@ -5,11 +5,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useStore, type CartProduct } from "./store-provider";
 import { rp } from "@/lib/utils";
+import { useStoreHours } from "./store-hours";
+import { fmtTime } from "@/lib/store-hours";
 
 export function CartDrawer({ loggedIn, initialProducts, initialWa }: { loggedIn: boolean; initialProducts: CartProduct[]; initialWa: string }) {
   const { cart, products, count, total, drawerOpen, closeDrawer, inc, dec, remove, openDrawer, toast, clear, setProductCache } =
     useStore();
   const router = useRouter();
+  const { hours, open: storeOpen } = useStoreHours();
+  const closed = storeOpen === false;
   const [note, setNote] = useState("");
   const [wa, setWa] = useState(initialWa);
   useEffect(() => { setProductCache(initialProducts); }, [initialProducts, setProductCache]);
@@ -21,7 +25,7 @@ export function CartDrawer({ loggedIn, initialProducts, initialWa }: { loggedIn:
   const entries = Object.entries(cart).filter(([id]) => products[id]);
 
   async function checkout() {
-    if (count === 0) return;
+    if (count === 0 || closed) return;
     if (!loggedIn) {
       toast("Masuk atau daftar dulu ya, biar pesananmu tersimpan.");
       router.push("/masuk?next=/keranjang");
@@ -173,7 +177,11 @@ export function CartDrawer({ loggedIn, initialProducts, initialWa }: { loggedIn:
             <span>Total</span>
             <span className="mono">{rp(total)}</span>
           </div>
-          {loggedIn ? (
+          {closed ? (
+            <button className="btn btn-red" type="button" disabled>
+              Toko tutup — buka lagi {fmtTime(hours.open)} WIB
+            </button>
+          ) : loggedIn ? (
             <button className="btn btn-red" onClick={checkout} type="button" disabled={count === 0 || loading}>
               {loading ? (
                 <>
@@ -189,6 +197,7 @@ export function CartDrawer({ loggedIn, initialProducts, initialWa }: { loggedIn:
             </Link>
           )}
           <p className="kirim-note">
+            {closed && "Keranjang tetap tersimpan — checkout bisa dilanjutkan saat toko buka. "}
             Setelah lunas, klaim akun via WhatsApp. Admin mengirim secara manual. Riwayat tersimpan di akunmu.
           </p>
         </div>

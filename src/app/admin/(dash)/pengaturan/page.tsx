@@ -10,6 +10,9 @@ export default async function AdminPengaturanPage() {
     SETTING_KEYS.storeTagline,
     SETTING_KEYS.storeAddress,
     SETTING_KEYS.marqueeItems,
+    SETTING_KEYS.googleEnabled,
+    SETTING_KEYS.openTime,
+    SETTING_KEYS.closeTime,
   ]);
 
   return (
@@ -33,6 +36,24 @@ export default async function AdminPengaturanPage() {
             Format internasional tanpa tanda +, mis. <b>6281234567890</b>. Boleh diawali 0 — otomatis dinormalkan.
           </small>
         </label>
+
+        <div className="field">
+          <span>Jam Operasional (WIB)</span>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="field" style={{ marginBottom: 0 }}>
+              <small style={{ color: "var(--ink-soft)" }}>Jam buka</small>
+              <input className="input mono" type="time" name="open_time" defaultValue={s[SETTING_KEYS.openTime]} required />
+            </label>
+            <label className="field" style={{ marginBottom: 0 }}>
+              <small style={{ color: "var(--ink-soft)" }}>Jam tutup</small>
+              <input className="input mono" type="time" name="close_time" defaultValue={s[SETTING_KEYS.closeTime]} required />
+            </label>
+          </div>
+          <small style={{ color: "var(--ink-soft)" }}>
+            Di luar jam ini toko <b>tutup</b>: pembeli melihat pemberitahuan dan tidak bisa checkout. Jam tutup lebih kecil
+            dari jam buka = buka melewati tengah malam. Jam sama = buka 24 jam.
+          </small>
+        </div>
 
         <label className="field">
           <span>Nama Toko</span>

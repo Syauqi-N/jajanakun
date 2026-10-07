@@ -1,3 +1,4 @@
+import { DEFAULT_HOURS, isValidHHMM, type StoreHours } from "./store-hours";
 import { prisma } from "./prisma";
 
 /**
@@ -12,6 +13,8 @@ export const SETTING_KEYS = {
   storeAddress: "store_address",
   googleEnabled: "google_enabled",
   marqueeItems: "marquee_items",
+  openTime: "open_time",
+  closeTime: "close_time",
 } as const;
 
 /** Teks running banner default (dipakai bila admin belum mengubah). */
@@ -38,6 +41,8 @@ const FALLBACK: Record<string, string> = {
   [SETTING_KEYS.storeTagline]: "Warung Akun Premium",
   [SETTING_KEYS.storeAddress]: "",
   [SETTING_KEYS.marqueeItems]: DEFAULT_MARQUEE.join("\n"),
+  [SETTING_KEYS.openTime]: DEFAULT_HOURS.open,
+  [SETTING_KEYS.closeTime]: DEFAULT_HOURS.close,
 };
 
 /** Ambil satu pengaturan; jatuh ke default env/konstanta bila belum diisi. */
@@ -76,4 +81,13 @@ export function normalizeWa(input: string): string {
   else if (d.startsWith("620")) d = "62" + d.slice(3);
   else if (!d.startsWith("62")) d = "62" + d;
   return d;
+}
+
+/** Jam operasional toko (WIB) dari Pengaturan; nilai rusak jatuh ke default. */
+export async function getStoreHours(): Promise<StoreHours> {
+  const [open, close] = await Promise.all([getSetting(SETTING_KEYS.openTime), getSetting(SETTING_KEYS.closeTime)]);
+  return {
+    open: isValidHHMM(open) ? open : DEFAULT_HOURS.open,
+    close: isValidHHMM(close) ? close : DEFAULT_HOURS.close,
+  };
 }

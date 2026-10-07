@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Alfa_Slab_One, Plus_Jakarta_Sans, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/components/store-provider";
+import { StoreHoursProvider } from "@/components/store-hours";
+import { getStoreHours } from "@/lib/settings";
 
 const alfa = Alfa_Slab_One({
   weight: "400",
@@ -36,11 +38,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const hours = await getStoreHours();
   return (
     <html lang="id" className={`${alfa.variable} ${jakarta.variable} ${mono.variable}`}>
       <body>
-        <StoreProvider>{children}</StoreProvider>
+        <StoreHoursProvider hours={hours}>
+          <StoreProvider>{children}</StoreProvider>
+        </StoreHoursProvider>
       </body>
     </html>
   );

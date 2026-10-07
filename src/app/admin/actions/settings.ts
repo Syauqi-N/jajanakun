@@ -2,13 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { currentAdmin, isAdmin, isSuperAdmin } from "@/lib/auth";
-import { SETTING_KEYS, normalizeWa, setSetting } from "@/lib/settings";
+import { currentAdmin, isSuperAdmin } from "@/lib/auth";
 import { hashPassword, randomPassword } from "@/lib/password";
-
-async function guard() {
-  if (!(await isAdmin())) throw new Error("Tidak diizinkan.");
-}
 
 async function guardSuper() {
   if (!(await isSuperAdmin())) throw new Error("Hanya admin utama yang bisa mengelola admin.");
@@ -71,23 +66,4 @@ export async function deleteAdmin(formData: FormData) {
   if (me?.email === row.email) return;
   await prisma.admin.delete({ where: { id } });
   revalidatePath("/admin/admin");
-}
-
-/* ---------------- Pengaturan toko ---------------- */
-
-export async function saveSettings(formData: FormData) {
-  await guard();
-
-  const wa = normalizeWa(String(formData.get("admin_wa") || ""));
-  if (!wa || wa.length < 9) throw new Error("Nomor WhatsApp tidak valid.");
-
-  await setSetting(SETTING_KEYS.adminWa, wa);
-  await setSetting(SETTING_KEYS.storeName, String(formData.get("store_name") || ""));
-  await setSetting(SETTING_KEYS.storeTagline, String(formData.get("store_tagline") || ""));
-  await setSetting(SETTING_KEYS.storeAddress, String(formData.get("store_address") || ""));
-  await setSetting(SETTING_KEYS.marqueeItems, String(formData.get("marquee_items") || ""));
-  await setSetting(SETTING_KEYS.googleEnabled, formData.get("google_enabled") ? "1" : "0");
-
-  revalidatePath("/admin/pengaturan");
-  revalidatePath("/", "layout");
 }

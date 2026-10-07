@@ -3,6 +3,8 @@ import { createOrder } from "@/lib/orders";
 import { getCurrentUser } from "@/lib/user-auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { clip, isSameOrigin } from "@/lib/request";
+import { getStoreHours } from "@/lib/settings";
+import { formatHours, isStoreOpen } from "@/lib/store-hours";
 
 export async function POST(req: Request) {
   if (!isSameOrigin(req)) return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
@@ -10,6 +12,14 @@ export async function POST(req: Request) {
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Kamu harus masuk dulu sebelum membeli.", code: "UNAUTHORIZED" }, { status: 401 });
+    }
+    // Di luar jam operasional toko tidak menerima pesanan.
+    const hours = await getStoreHours();
+    if (!isStoreOpen(hours)) {
+      return NextResponse.json(
+        { error: `Toko sedang tutup. Pesanan bisa dibuat lagi pada jam buka (${formatHours(hours)}).`, code: "STORE_CLOSED" },
+        { status: 403 },
+      );
     }
     // Tiap pesanan membuat transaksi di gateway — batasi 10 pesanan / 10 menit per user.
     if (!rateLimit(`order:${user.id}`, 10, 10 * 60_000)) {
