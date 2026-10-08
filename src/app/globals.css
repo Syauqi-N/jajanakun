@@ -439,6 +439,16 @@ h3 {
   font-size: 21px;
   box-shadow: 2px 2px 0 rgba(51, 36, 26, 0.8);
 }
+.tile-img {
+  overflow: hidden;
+  background: var(--paper-2);
+}
+.tile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .tag-card.mini .tile {
   width: 42px;
   height: 42px;
@@ -1788,7 +1798,17 @@ table.gk tr:last-child td {
   .tag-card.mini {
     padding: 20px 12px 12px;
   }
-  .tag-card.mini .tile {
+  .tile-img {
+  overflow: hidden;
+  background: var(--paper-2);
+}
+.tile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tag-card.mini .tile {
     width: 38px;
     height: 38px;
     font-size: 15px;

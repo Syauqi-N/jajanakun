@@ -12,6 +12,7 @@ type ProductLite = {
   tileBg: string;
   tileFg: string;
   letter: string;
+  imageUrl?: string | null;
   isPreOrder: boolean;
   poClosed: boolean;
 };

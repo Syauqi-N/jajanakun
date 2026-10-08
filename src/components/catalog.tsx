@@ -37,6 +37,23 @@ function stockLabel(p: ProductDTO): { text: string; cls: string } {
   return { text: "Tersedia • Kirim via WhatsApp", cls: "badge-green" };
 }
 
+/** Ikon kotak kecil produk: gambar upload bila ada, selain itu tile huruf. */
+export function ProductTile({ p }: { p: Pick<ProductDTO, "name" | "tileBg" | "tileFg" | "letter"> & { imageUrl?: string | null } }) {
+  if (p.imageUrl) {
+    return (
+      <div className="tile tile-img">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={p.imageUrl} alt={p.name} loading="lazy" />
+      </div>
+    );
+  }
+  return (
+    <div className="tile" style={{ background: p.tileBg, color: p.tileFg }}>
+      {p.letter}
+    </div>
+  );
+}
+
 export function ProductThumb({ p, className = "tag-thumb" }: { p: ProductDTO; className?: string }) {
   if (p.imageUrl) {
     return (
@@ -74,6 +91,7 @@ export function ProductCard({ p, mini = false }: { p: ProductDTO; mini?: boolean
       tileBg: p.tileBg,
       tileFg: p.tileFg,
       letter: p.letter,
+      imageUrl: p.imageUrl,
       isPreOrder: p.isPreOrder,
     }),
     [p]
@@ -91,11 +109,7 @@ export function ProductCard({ p, mini = false }: { p: ProductDTO; mini?: boolean
       {!mini && <ProductThumb p={p} />}
       <div className="tag-top">
         {p.badge && !mini && <span className="ribbon">{p.badge.toUpperCase()}</span>}
-        {mini && (
-          <div className="tile" style={{ background: p.tileBg, color: p.tileFg }}>
-            {p.letter}
-          </div>
-        )}
+        {mini && <ProductTile p={p} />}
         <div>
           <Link href={`/produk/${p.slug}`} className={`tag-name block hover:underline`} style={{ textDecorationColor: "var(--red)" }}>
             {p.name}

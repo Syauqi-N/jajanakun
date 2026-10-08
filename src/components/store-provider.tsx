@@ -11,6 +11,7 @@ export type CartProduct = {
   tileBg: string;
   tileFg: string;
   letter: string;
+  imageUrl?: string | null;
   isPreOrder?: boolean;
 };
 

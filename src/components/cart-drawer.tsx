@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useStore, type CartProduct } from "./store-provider";
+import { ProductTile } from "./catalog";
 import { rp } from "@/lib/utils";
 import { useStoreHours } from "./store-hours";
 import { fmtTime } from "@/lib/store-hours";
@@ -102,9 +103,7 @@ export function CartDrawer({ loggedIn, initialProducts, initialWa }: { loggedIn:
               const p = products[id];
               return (
                 <div className="cart-item" key={id}>
-                  <div className="tile" style={{ background: p.tileBg, color: p.tileFg }}>
-                    {p.letter}
-                  </div>
+                  <ProductTile p={p} />
                   <div>
                     <div className="ci-name">{p.name}</div>
                     <div className="ci-price">{rp(p.price)} / akun</div>
